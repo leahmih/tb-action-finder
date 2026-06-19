@@ -1,1 +1,45 @@
-<h1>TB Action Finder</h1><p>Helping you take action against TB.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TB Action Finder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>TB Action Finder</h1>
+    </header>
+
+    <!-- Screen 1: Country -->
+    <section id="screen-country" class="screen active" aria-labelledby="country-heading">
+      <h2 id="country-heading">Which country are you in?</h2>
+      <div class="button-group" role="group" aria-labelledby="country-heading">
+        <button class="choice-btn" data-country="US">United States</button>
+        <button class="choice-btn" data-country="UK">United Kingdom</button>
+        <button class="choice-btn" data-country="CA">Canada</button>
+        <button class="choice-btn" data-country="other">Other</button>
+      </div>
+    </section>
+
+    <!-- Screen 2: Time -->
+    <section id="screen-time" class="screen" aria-labelledby="time-heading">
+      <h2 id="time-heading">How much time do you have?</h2>
+      <div class="button-group" role="group" aria-labelledby="time-heading">
+        <button class="choice-btn" data-time="tonight">Under 30 minutes, tonight</button>
+        <button class="choice-btn" data-time="weekly">About 30 minutes, weekly</button>
+        <button class="choice-btn" data-time="deeper">More — I want to go deeper</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Results -->
+    <section id="screen-results" class="screen" aria-labelledby="results-heading">
+      <h2 id="results-heading">Your actions</h2>
+      <p class="placeholder">Results will appear here</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

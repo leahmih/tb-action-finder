@@ -1,0 +1,92 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f8f8f6;
+  color: #1a1a1a;
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem 3rem;
+}
+
+main {
+  width: 100%;
+  max-width: 480px;
+}
+
+header {
+  margin-bottom: 2.5rem;
+}
+
+h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #555;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 1.5rem;
+}
+
+/* Screen visibility */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* Button group */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.choice-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: left;
+  background: #fff;
+  color: #1a1a1a;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.choice-btn:hover {
+  border-color: #b8292f;
+  background: #fff5f5;
+}
+
+.choice-btn:focus-visible {
+  outline: 3px solid #b8292f;
+  outline-offset: 2px;
+}
+
+.choice-btn:active {
+  background: #fce8e8;
+}
+
+/* Results placeholder */
+.placeholder {
+  color: #888;
+  font-size: 1rem;
+  padding: 2rem 0;
+}
