@@ -1,0 +1,103 @@
+{
+  "_comment": "Countries: US / UK / CA / any ('Other' matches only 'any' actions + fallbacks; Australia folds here). Filtered by countries + timeBuckets, dropped if active=false, sorted by importanceRank (1=top). Ranking rule: engine floats a user's own-country rep_contact action above cross-cutting corporate actions (PRD D5). 'weekly' bucket renders a 'set a weekly reminder' button (calendar link, NOT email). Every card also shows a universal 'Sign up for TBFighters emails' button -> emailSignupUrl. type controls future embedding only; in the MVP every type routes out via actionUrl. immediate:false => future-event CTA. TODO links need confirming.",
+  "emailSignupUrl": "TODO: confirm TBFighters email signup URL (used by the universal Sign up button on every card)",
+  "actions": [
+    {
+      "id": "pepfar-funding",
+      "title": "Tell your reps to release the withheld PEPFAR funding",
+      "blurb": "Congress already approved this money; it's being withheld. Ask your representatives to demand it's released now.",
+      "countries": ["US"],
+      "timeBuckets": ["tonight", "weekly"],
+      "importanceRank": 1,
+      "active": true,
+      "immediate": true,
+      "type": "rep_contact",
+      "actionUrl": "https://tbfightertofu.github.io/hill_day/moc_list.html",
+      "learnMore": "https://tbfighters.org/funding-cuts/",
+      "weeklyNudge": "Set a weekly reminder to call — sustained pressure is what moves funding."
+    },
+    {
+      "id": "danaher-email",
+      "title": "Email Danaher to release their audit",
+      "blurb": "Danaher promised an independent audit of their TB test costs over two years ago and still hasn't published it.",
+      "countries": ["any"],
+      "timeBuckets": ["tonight", "weekly"],
+      "importanceRank": 2,
+      "active": true,
+      "immediate": true,
+      "type": "email_template",
+      "actionUrl": "https://tbfighters.org/templates/danaher",
+      "learnMore": "https://tbfighters.org/danaher/",
+      "weeklyNudge": "Set a weekly reminder to send a fresh message — every one counts."
+    },
+    {
+      "id": "uk-funding",
+      "title": "Contact your MP about TB funding",
+      "blurb": "Ask your Member of Parliament to back funding for the global TB response.",
+      "countries": ["UK"],
+      "timeBuckets": ["tonight", "weekly"],
+      "importanceRank": 3,
+      "active": true,
+      "immediate": true,
+      "type": "rep_contact",
+      "actionUrl": "TODO: confirm UK Act Now link from tbfighters.org/action (later: in-tool postcode -> MP lookup)",
+      "learnMore": "https://tbfighters.org/action",
+      "weeklyNudge": "Set a weekly reminder — repeated contact from constituents is what moves MPs."
+    },
+    {
+      "id": "ca-funding",
+      "title": "Contact your MP about TB funding",
+      "blurb": "Ask your Member of Parliament to support Canada's contribution to ending TB.",
+      "countries": ["CA"],
+      "timeBuckets": ["tonight", "weekly"],
+      "importanceRank": 4,
+      "active": true,
+      "immediate": true,
+      "type": "rep_contact",
+      "actionUrl": "TODO: confirm Canada Act Now link (likely RESULTS Canada) — no verified TBFighters Canada action yet",
+      "learnMore": "https://tbfighters.org/action",
+      "weeklyNudge": "Set a weekly reminder — consistent constituent contact keeps TB on the agenda."
+    },
+    {
+      "id": "dear-colleague",
+      "title": "Get your reps to sign the Dear Colleague letters",
+      "blurb": "Ask your senators and representative to sign on to the letters supporting domestic and global TB funding.",
+      "countries": ["US"],
+      "timeBuckets": ["deeper"],
+      "importanceRank": 5,
+      "active": true,
+      "immediate": true,
+      "type": "rep_contact",
+      "actionUrl": "https://tbfightertofu.github.io/hill_day/moc_list.html",
+      "learnMore": "https://tbfighters.org/hill-day/"
+    },
+    {
+      "id": "hill-day",
+      "title": "Join TB Hill Day in Washington, DC",
+      "blurb": "Advocate for TB funding in person on Capitol Hill alongside survivors and experts.",
+      "countries": ["US"],
+      "timeBuckets": ["deeper"],
+      "importanceRank": 3,
+      "active": false,
+      "immediate": false,
+      "_activeNote": "2026 applications are CLOSED. Flip active to true when they reopen; immediate:false keeps it as a sign-up CTA, not a do-now card.",
+      "type": "future_event",
+      "actionUrl": "https://tbfighters.org/hill-day/",
+      "signupUrl": "https://tbfighters.org/hill-day/",
+      "learnMore": "https://tbfighters.org/hill-day/"
+    },
+    {
+      "id": "recruit",
+      "title": "Bring a friend into the fight",
+      "blurb": "Share the campaign with someone who'd care — more voices is the highest-leverage thing you can do with extra time.",
+      "countries": ["any"],
+      "timeBuckets": ["deeper"],
+      "importanceRank": 8,
+      "active": true,
+      "immediate": true,
+      "type": "external_link",
+      "actionUrl": "https://tbfighters.org/",
+      "learnMore": "https://tbfighters.org/about"
+    }
+  ]
+}
