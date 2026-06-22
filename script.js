@@ -1,6 +1,10 @@
+let actions = [];
+let chosenCountry = null;
+let chosenTimeBucket = null;
+
 fetch('actions.json')
   .then(res => res.json())
-  .then(data => console.log('actions.json loaded:', data))
+  .then(data => { actions = data.actions; })
   .catch(err => console.error('Failed to load actions.json:', err));
 
 const screens = {
@@ -15,16 +19,61 @@ function showScreen(name) {
   screens[name].querySelector('h2')?.focus();
 }
 
-// Country buttons -> time screen
+function getRecommendedActions() {
+  return actions
+    .filter(a => a.countries.includes(chosenCountry) || a.countries.includes('any'))
+    .filter(a => a.timeBuckets.includes(chosenTimeBucket))
+    .filter(a => a.active !== false)
+    .sort((a, b) => a.importanceRank - b.importanceRank);
+}
+
+function renderResults() {
+  const container = screens.results;
+  const existing = container.querySelector('.results-list, .no-results');
+  if (existing) existing.remove();
+
+  const matches = getRecommendedActions();
+
+  if (matches.length === 0) {
+    const msg = document.createElement('p');
+    msg.className = 'no-results';
+    msg.textContent = 'No actions found.';
+    container.appendChild(msg);
+    return;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'results-list';
+
+  matches.forEach(action => {
+    const card = document.createElement('div');
+    card.className = 'action-card';
+
+    const title = document.createElement('h3');
+    title.textContent = action.title;
+
+    const blurb = document.createElement('p');
+    blurb.textContent = action.blurb;
+
+    card.appendChild(title);
+    card.appendChild(blurb);
+    list.appendChild(card);
+  });
+
+  container.appendChild(list);
+}
+
 document.querySelectorAll('[data-country]').forEach(btn => {
   btn.addEventListener('click', () => {
+    chosenCountry = btn.dataset.country;
     showScreen('time');
   });
 });
 
-// Time buttons -> results screen
 document.querySelectorAll('[data-time]').forEach(btn => {
   btn.addEventListener('click', () => {
+    chosenTimeBucket = btn.dataset.time;
+    renderResults();
     showScreen('results');
   });
 });
