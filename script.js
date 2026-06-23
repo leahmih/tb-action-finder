@@ -20,11 +20,26 @@ function showScreen(name) {
 }
 
 function getRecommendedActions() {
-  return actions
+  const sorted = actions
     .filter(a => a.countries.includes(chosenCountry) || a.countries.includes('any'))
     .filter(a => a.timeBuckets.includes(chosenTimeBucket))
     .filter(a => a.active !== false)
-    .sort((a, b) => a.importanceRank - b.importanceRank);
+    .sort((a, b) => {
+      const aIsOwnRep = a.type === 'rep_contact' && a.countries.includes(chosenCountry);
+      const bIsOwnRep = b.type === 'rep_contact' && b.countries.includes(chosenCountry);
+      const aIsDanaher = a.type === 'email_template';
+      const bIsDanaher = b.type === 'email_template';
+      if (aIsOwnRep && bIsDanaher) return -1;
+      if (aIsDanaher && bIsOwnRep) return 1;
+      return a.importanceRank - b.importanceRank;
+    });
+  const firstImmediateIdx = sorted.findIndex(a => a.immediate !== false);
+  if (firstImmediateIdx > 0) {
+    const top = sorted[firstImmediateIdx];
+    const rest = sorted.filter((_, i) => i !== firstImmediateIdx);
+    return [top, ...rest];
+  }
+  return sorted;
 }
 
 function renderResults() {
