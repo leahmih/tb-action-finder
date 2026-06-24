@@ -46,6 +46,83 @@ function getRecommendedActions() {
   return sorted;
 }
 
+// --- ICS helpers ---
+
+function escapeICS(str) {
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
+function foldICSLine(line) {
+  if (line.length <= 75) return line;
+  let result = line.slice(0, 75);
+  let i = 75;
+  while (i < line.length) {
+    result += '\r\n ' + line.slice(i, i + 74);
+    i += 74;
+  }
+  return result;
+}
+
+function formatICSLocal(date) {
+  const p = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}T${p(date.getHours())}${p(date.getMinutes())}${p(date.getSeconds())}`;
+}
+
+function formatICSUTC(date) {
+  const p = n => String(n).padStart(2, '0');
+  return `${date.getUTCFullYear()}${p(date.getUTCMonth() + 1)}${p(date.getUTCDate())}T${p(date.getUTCHours())}${p(date.getUTCMinutes())}${p(date.getUTCSeconds())}Z`;
+}
+
+function generateICSContent(action) {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(start.getDate() + 7);
+  start.setHours(19, 0, 0, 0);
+  const end = new Date(start.getTime() + 15 * 60 * 1000);
+
+  const uid = `${action.id}-${now.getTime()}@tb-action-finder`;
+  const nudge = action.weeklyNudge || 'Take action again this week.';
+  const desc = escapeICS(`${nudge}\n${action.actionUrl}`);
+  const summary = escapeICS(`TB action: ${action.title}`);
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//TB Action Finder//EN',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${formatICSUTC(now)}`,
+    `DTSTART:${formatICSLocal(start)}`,
+    `DTEND:${formatICSLocal(end)}`,
+    `SUMMARY:${summary}`,
+    `DESCRIPTION:${desc}`,
+    'RRULE:FREQ=WEEKLY',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ];
+
+  return lines.map(foldICSLine).join('\r\n');
+}
+
+function downloadICS(filename, content) {
+  const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// --- Render ---
+
 function renderResults() {
   const container = screens.results;
   const existing = container.querySelector('.results-list, .no-results');
@@ -103,6 +180,16 @@ function renderResults() {
     actions_row.appendChild(primaryBtn);
     actions_row.appendChild(learnMoreLink);
     actions_row.appendChild(signupBtn);
+
+    if (chosenTimeBucket === 'weekly') {
+      const reminderBtn = document.createElement('button');
+      reminderBtn.textContent = 'Set a weekly reminder';
+      reminderBtn.className = 'btn-secondary';
+      reminderBtn.addEventListener('click', () => {
+        downloadICS(`tb-action-${action.id}.ics`, generateICSContent(action));
+      });
+      actions_row.appendChild(reminderBtn);
+    }
 
     card.appendChild(title);
     card.appendChild(blurb);
