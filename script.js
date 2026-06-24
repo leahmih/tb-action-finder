@@ -1,10 +1,14 @@
 let actions = [];
+let emailSignupUrl = '';
 let chosenCountry = null;
 let chosenTimeBucket = null;
 
 fetch('actions.json')
   .then(res => res.json())
-  .then(data => { actions = data.actions; })
+  .then(data => {
+    actions = data.actions;
+    emailSignupUrl = data.emailSignupUrl;
+  })
   .catch(err => console.error('Failed to load actions.json:', err));
 
 const screens = {
@@ -70,8 +74,39 @@ function renderResults() {
     const blurb = document.createElement('p');
     blurb.textContent = action.blurb;
 
+    const primaryUrl = action.immediate === false ? action.signupUrl : action.actionUrl;
+    const primaryLabel = action.immediate === false ? 'Sign me up' : 'Take action';
+
+    const primaryBtn = document.createElement('a');
+    primaryBtn.href = primaryUrl;
+    primaryBtn.textContent = primaryLabel;
+    primaryBtn.className = 'btn-primary';
+    primaryBtn.target = '_blank';
+    primaryBtn.rel = 'noopener noreferrer';
+
+    const learnMoreLink = document.createElement('a');
+    learnMoreLink.href = action.learnMore;
+    learnMoreLink.textContent = 'Learn more';
+    learnMoreLink.className = 'link-secondary';
+    learnMoreLink.target = '_blank';
+    learnMoreLink.rel = 'noopener noreferrer';
+
+    const signupBtn = document.createElement('a');
+    signupBtn.href = emailSignupUrl;
+    signupBtn.textContent = 'Sign up for TBFighters emails';
+    signupBtn.className = 'btn-secondary';
+    signupBtn.target = '_blank';
+    signupBtn.rel = 'noopener noreferrer';
+
+    const actions_row = document.createElement('div');
+    actions_row.className = 'card-actions';
+    actions_row.appendChild(primaryBtn);
+    actions_row.appendChild(learnMoreLink);
+    actions_row.appendChild(signupBtn);
+
     card.appendChild(title);
     card.appendChild(blurb);
+    card.appendChild(actions_row);
     list.appendChild(card);
   });
 

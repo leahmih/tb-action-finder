@@ -90,3 +90,92 @@ h2 {
   font-size: 1rem;
   padding: 2rem 0;
 }
+
+/* Action cards */
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.action-card {
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.action-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.action-card > p {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #b8292f;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: #941f24;
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid #b8292f;
+  outline-offset: 3px;
+}
+
+.link-secondary {
+  font-size: 0.875rem;
+  color: #555;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-secondary:hover {
+  color: #1a1a1a;
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #555;
+  background: transparent;
+  border: 1.5px solid #ccc;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-secondary:hover {
+  border-color: #888;
+  color: #1a1a1a;
+}
+
+.btn-secondary:focus-visible {
+  outline: 3px solid #b8292f;
+  outline-offset: 2px;
+}
