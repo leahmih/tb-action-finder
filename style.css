@@ -1,54 +1,83 @@
+/*
+ * TB Action Finder — scoped to main
+ * Colours and typography match tbfighters.org.
+ * To embed site-wide: add class="tbaf" to <main> and prefix
+ * every selector here with .tbaf instead of main.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap');
+
+/* ---- Reset ---- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ---- Page shell ---- */
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f8f8f6;
-  color: #1a1a1a;
+  background: #fcf3e3;
   min-height: 100dvh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 1.5rem 1rem 3rem;
+  padding: 0 0 4rem;
 }
 
 main {
+  font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  font-weight: 400;
+  color: #121212;
   width: 100%;
-  max-width: 480px;
+  max-width: 540px;
+  margin: 0 auto;
 }
 
-header {
+/* ---- Header ---- */
+main > header {
+  background: #bc1c1a;
+  color: #fcf3e3;
+  padding: 1.5rem 1.75rem 1.25rem;
   margin-bottom: 2.5rem;
 }
 
-h1 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #555;
+main > header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: #fcf3e3;
 }
 
-h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1.25;
-  margin-bottom: 1.5rem;
+main > header::after {
+  content: "Find your best TB advocacy action";
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(252, 243, 227, 0.8);
+  margin-top: 0.3rem;
 }
 
-/* Screen visibility */
+/* ---- Screen wrapper ---- */
 .screen {
   display: none;
+  padding: 0 1.75rem;
 }
 
 .screen.active {
   display: block;
 }
 
-/* Button group */
+/* ---- Question heading ---- */
+.screen > h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+  color: #121212;
+}
+
+/* ---- Choice buttons ---- */
 .button-group {
   display: flex;
   flex-direction: column;
@@ -58,63 +87,71 @@ h2 {
 .choice-btn {
   display: block;
   width: 100%;
-  padding: 1rem 1.25rem;
+  padding: 0.9rem 1.25rem;
+  font-family: inherit;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   text-align: left;
-  background: #fff;
-  color: #1a1a1a;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  background: #fcf3e3;
+  color: #121212;
+  border: 3px solid #121212;
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  box-shadow: 0.3em 0.3em 0 0 #121212;
+  transition: background 0.12s, color 0.12s, box-shadow 0.08s, transform 0.08s;
 }
 
 .choice-btn:hover {
-  border-color: #b8292f;
-  background: #fff5f5;
-}
-
-.choice-btn:focus-visible {
-  outline: 3px solid #b8292f;
-  outline-offset: 2px;
+  background: #121212;
+  color: #fcf3e3;
 }
 
 .choice-btn:active {
-  background: #fce8e8;
+  box-shadow: 0.1em 0.1em 0 0 #121212;
+  transform: translate(0.2em, 0.2em);
 }
 
-/* Results placeholder */
-.placeholder {
-  color: #888;
-  font-size: 1rem;
-  padding: 2rem 0;
+.choice-btn:focus-visible {
+  outline: 2px solid #fcf3e3;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px #121212;
 }
 
-/* Action cards */
+/* ---- Results ---- */
 .results-list {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.75rem;
 }
 
+.placeholder {
+  color: #666;
+  font-size: 1rem;
+  padding: 1.5rem 0;
+}
+
+/* ---- Action cards ---- */
 .action-card {
-  background: #fff;
-  border: 2px solid #ddd;
-  border-radius: 10px;
+  background: #fcf3e3;
+  border: 3px solid #121212;
+  border-radius: 0.5rem;
   padding: 1.25rem;
+  box-shadow: -0.45em 0.45em 0 0 #bc1c1a, -0.45em 0.45em 0 3px #121212;
 }
 
 .action-card h3 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   margin-bottom: 0.5rem;
+  color: #121212;
 }
 
 .action-card > p {
   font-size: 0.95rem;
   color: #444;
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 1rem;
 }
 
@@ -125,60 +162,87 @@ h2 {
   gap: 0.75rem;
 }
 
+/* ---- Take action button (dominant) ---- */
 .btn-primary {
   display: inline-block;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  background: #b8292f;
-  border-radius: 6px;
+  padding: 0.55rem 1.15rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fcf3e3;
+  background: #bc1c1a;
+  border: 3px solid #bc1c1a;
+  border-radius: 0.5rem;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 
-.btn-primary:hover {
-  background: #941f24;
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #121212;
+  border-color: #121212;
+  color: #fcf3e3;
 }
 
 .btn-primary:focus-visible {
-  outline: 3px solid #b8292f;
-  outline-offset: 3px;
+  outline: 2px solid #fcf3e3;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px #121212;
 }
 
+/* ---- Learn more link (quiet) ---- */
 .link-secondary {
   font-size: 0.875rem;
-  color: #555;
+  font-weight: 500;
+  color: #bc1c1a;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
 .link-secondary:hover {
-  color: #1a1a1a;
+  color: #121212;
 }
 
+/* ---- Calendar / sign-up button (quieter still) ---- */
 .btn-secondary {
   display: inline-block;
   padding: 0.4rem 0.85rem;
-  font-size: 0.8rem;
-  font-weight: 500;
   font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: #555;
   background: transparent;
-  border: 1.5px solid #ccc;
-  border-radius: 5px;
+  border: 2px solid #bbb;
+  border-radius: 0.5rem;
   text-decoration: none;
   cursor: pointer;
   appearance: none;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
 
 .btn-secondary:hover {
-  border-color: #888;
-  color: #1a1a1a;
+  border-color: #121212;
+  color: #121212;
+  background: #dddad4;
 }
 
 .btn-secondary:focus-visible {
-  outline: 3px solid #b8292f;
-  outline-offset: 2px;
+  outline: 2px solid #fcf3e3;
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px #121212;
+}
+
+/* ---- Footer ---- */
+main::after {
+  content: "tbfighters.org";
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #bc1c1a;
+  margin-top: 3rem;
+  padding: 1.25rem 1.75rem;
+  border-top: 2px solid #dddad4;
 }
