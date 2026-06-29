@@ -31,14 +31,20 @@ main {
 }
 
 /* ---- Header ---- */
-main > header {
+body > header {
   background: #bc1c1a;
   color: #fcf3e3;
-  padding: 1.5rem 1.75rem 1.25rem;
+  padding: 1.5rem 0 1.25rem;
   margin-bottom: 2.5rem;
 }
 
-main > header h1 {
+.header-inner {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+}
+
+body > header h1 {
   font-size: 1.75rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -47,7 +53,7 @@ main > header h1 {
   color: #fcf3e3;
 }
 
-main > header::after {
+.header-inner::after {
   content: "Find your best TB advocacy action";
   display: block;
   font-size: 0.875rem;
@@ -245,4 +251,70 @@ main::after {
   margin-top: 3rem;
   padding: 1.25rem 1.75rem;
   border-top: 2px solid #dddad4;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 479px) {
+  /* Tighten side padding so cards have more room */
+  .header-inner,
+  .screen {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  main::after {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  /* Scale headings down a notch */
+  body > header h1 {
+    font-size: 1.4rem;
+  }
+
+  .screen > h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Stack card action buttons vertically, stretch to full width */
+  .card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Larger tap targets on mobile */
+  .btn-primary {
+    text-align: center;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .btn-secondary {
+    text-align: center;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+
+  /* Give the Learn more link a generous tap area */
+  .link-secondary {
+    display: block;
+    padding: 0.35rem 0;
+  }
+}
+
+/* ---- Small phones (320–375px) ---- */
+@media (max-width: 375px) {
+  /* Reduce card border padding so inner content isn't squeezed */
+  .action-card {
+    padding: 1rem;
+  }
+
+  /* More vertical air between card title, body text, and buttons */
+  .action-card h3 {
+    margin-bottom: 0.65rem;
+  }
+
+  .action-card > p {
+    margin-bottom: 1.25rem;
+  }
 }
