@@ -10,13 +10,14 @@
   <header>
     <div class="header-inner">
       <h1>TB Action Finder</h1>
+      <p class="tagline">Find your best TB advocacy action</p>
     </div>
   </header>
   <main>
 
     <!-- Screen 1: Country -->
     <section id="screen-country" class="screen active" aria-labelledby="country-heading">
-      <h2 id="country-heading">Which country are you in?</h2>
+      <h2 id="country-heading" tabindex="-1">Which country are you in?</h2>
       <div class="button-group" role="group" aria-labelledby="country-heading">
         <button class="choice-btn" data-country="US">United States</button>
         <button class="choice-btn" data-country="UK">United Kingdom</button>
@@ -27,7 +28,7 @@
 
     <!-- Screen 2: Time -->
     <section id="screen-time" class="screen" aria-labelledby="time-heading">
-      <h2 id="time-heading">How much time do you have?</h2>
+      <h2 id="time-heading" tabindex="-1">How much time do you have?</h2>
       <div class="button-group" role="group" aria-labelledby="time-heading">
         <button class="choice-btn" data-time="tonight">Under 30 minutes, tonight</button>
         <button class="choice-btn" data-time="weekly">About 30 minutes, weekly</button>
@@ -37,9 +38,13 @@
 
     <!-- Screen 3: Results -->
     <section id="screen-results" class="screen" aria-labelledby="results-heading">
-      <h2 id="results-heading">Your actions</h2>
+      <h2 id="results-heading" tabindex="-1">Your actions</h2>
     </section>
   </main>
+
+  <footer>
+    <p>tbfighters.org</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>

@@ -53,12 +53,10 @@ body > header h1 {
   color: #fcf3e3;
 }
 
-.header-inner::after {
-  content: "Find your best TB advocacy action";
-  display: block;
+.tagline {
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(252, 243, 227, 0.8);
+  color: rgba(252, 243, 227, 0.9);
   margin-top: 0.3rem;
 }
 
@@ -125,6 +123,7 @@ body > header h1 {
 
 /* ---- Results ---- */
 .results-list {
+  list-style: none;
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
@@ -209,6 +208,12 @@ body > header h1 {
   color: #121212;
 }
 
+.link-secondary:focus-visible {
+  outline: 3px solid #121212;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 /* ---- Calendar / sign-up button (quieter still) ---- */
 .btn-secondary {
   display: inline-block;
@@ -218,7 +223,7 @@ body > header h1 {
   font-weight: 600;
   color: #555;
   background: transparent;
-  border: 2px solid #bbb;
+  border: 2px solid #767676;
   border-radius: 0.5rem;
   text-decoration: none;
   cursor: pointer;
@@ -239,16 +244,15 @@ body > header h1 {
 }
 
 /* ---- Footer ---- */
-main::after {
-  content: "tbfighters.org";
-  display: block;
+body > footer {
+  max-width: 540px;
+  margin: 3rem auto 0;
   text-align: center;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #bc1c1a;
-  margin-top: 3rem;
   padding: 1.25rem 1.75rem;
   border-top: 2px solid #dddad4;
 }
@@ -262,7 +266,7 @@ main::after {
     padding-right: 1.25rem;
   }
 
-  main::after {
+  body > footer {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }

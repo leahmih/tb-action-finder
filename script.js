@@ -138,11 +138,11 @@ function renderResults() {
     return;
   }
 
-  const list = document.createElement('div');
+  const list = document.createElement('ul');
   list.className = 'results-list';
 
   matches.forEach(action => {
-    const card = document.createElement('div');
+    const card = document.createElement('li');
     card.className = 'action-card';
 
     const title = document.createElement('h3');
@@ -160,6 +160,7 @@ function renderResults() {
     primaryBtn.className = 'btn-primary';
     primaryBtn.target = '_blank';
     primaryBtn.rel = 'noopener noreferrer';
+    primaryBtn.setAttribute('aria-label', `${primaryLabel}: ${action.title} (opens in new tab)`);
 
     const learnMoreLink = document.createElement('a');
     learnMoreLink.href = action.learnMore;
@@ -167,6 +168,7 @@ function renderResults() {
     learnMoreLink.className = 'link-secondary';
     learnMoreLink.target = '_blank';
     learnMoreLink.rel = 'noopener noreferrer';
+    learnMoreLink.setAttribute('aria-label', `Learn more about ${action.title} (opens in new tab)`);
 
     const signupBtn = document.createElement('a');
     signupBtn.href = emailSignupUrl;
@@ -174,6 +176,7 @@ function renderResults() {
     signupBtn.className = 'btn-secondary';
     signupBtn.target = '_blank';
     signupBtn.rel = 'noopener noreferrer';
+    signupBtn.setAttribute('aria-label', 'Sign up for TBFighters emails (opens in new tab)');
 
     const actions_row = document.createElement('div');
     actions_row.className = 'card-actions';
@@ -185,6 +188,7 @@ function renderResults() {
       const reminderBtn = document.createElement('button');
       reminderBtn.textContent = 'Set a weekly reminder';
       reminderBtn.className = 'btn-secondary';
+      reminderBtn.setAttribute('aria-label', `Set a weekly reminder for ${action.title}`);
       reminderBtn.addEventListener('click', () => {
         downloadICS(`tb-action-${action.id}.ics`, generateICSContent(action));
       });
