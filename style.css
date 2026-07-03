@@ -257,6 +257,15 @@ body > footer {
   border-top: 2px solid #dddad4;
 }
 
+.footer-updated {
+  margin-top: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #9a9691;
+}
+
 /* ---- Mobile ---- */
 @media (max-width: 479px) {
   /* Tighten side padding so cards have more room */
