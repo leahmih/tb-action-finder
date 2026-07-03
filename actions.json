@@ -1,6 +1,6 @@
 {
   "_comment": "Countries: US / UK / CA / any ('Other' matches only 'any' actions + fallbacks; Australia folds here). Filtered by countries + timeBuckets, dropped if active=false, sorted by importanceRank (1=top). Ranking rule: engine floats a user's own-country rep_contact action above cross-cutting corporate actions (PRD D5). 'weekly' bucket renders a 'set a weekly reminder' button (calendar link, NOT email). Every card also shows a universal 'Sign up for TBFighters emails' button -> emailSignupUrl. type controls future embedding only; in the MVP every type routes out via actionUrl. immediate:false => future-event CTA. TODO links need confirming.",
-  "emailSignupUrl": "TODO: confirm TBFighters email signup URL (used by the universal Sign up button on every card)",
+  "emailSignupUrl": "https://newsletter.tbfighters.org/subscribe",
   "actions": [
     {
       "id": "pepfar-funding",
@@ -40,7 +40,7 @@
       "active": true,
       "immediate": true,
       "type": "rep_contact",
-      "actionUrl": "TODO: confirm UK Act Now link from tbfighters.org/action (later: in-tool postcode -> MP lookup)",
+      "actionUrl": "https://results.org.uk/news/uk-must-deliver-1-billion-for-the-global-fund/",
       "learnMore": "https://tbfighters.org/action",
       "weeklyNudge": "Set a weekly reminder — repeated contact from constituents is what moves MPs."
     },
@@ -54,7 +54,7 @@
       "active": true,
       "immediate": true,
       "type": "rep_contact",
-      "actionUrl": "TODO: confirm Canada Act Now link (likely RESULTS Canada) — no verified TBFighters Canada action yet",
+      "actionUrl": "https://resultscanada.ca/campaigns/",
       "learnMore": "https://tbfighters.org/action",
       "weeklyNudge": "Set a weekly reminder — consistent constituent contact keeps TB on the agenda."
     },
