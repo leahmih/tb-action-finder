@@ -51,6 +51,12 @@ body > header h1 {
   letter-spacing: 0.04em;
   line-height: 1.1;
   color: #fcf3e3;
+  cursor: pointer;
+}
+
+body > header h1:focus-visible {
+  outline: 2px solid #fcf3e3;
+  outline-offset: 3px;
 }
 
 .tagline {

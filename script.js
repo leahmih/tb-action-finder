@@ -204,6 +204,21 @@ function renderResults() {
   container.appendChild(list);
 }
 
+function resetToStart() {
+  chosenCountry = null;
+  chosenTimeBucket = null;
+  showScreen('country');
+}
+
+const siteTitle = document.getElementById('site-title');
+siteTitle.addEventListener('click', resetToStart);
+siteTitle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    resetToStart();
+  }
+});
+
 document.querySelectorAll('[data-country]').forEach(btn => {
   btn.addEventListener('click', () => {
     chosenCountry = btn.dataset.country;
