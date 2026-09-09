@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find my MP — test page</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page-local only: this is a standalone test page, style.css is untouched. */
+    .lookup-form { display: flex; flex-direction: column; gap: 0.75rem; }
+    .lookup-form label { font-weight: 600; }
+    .lookup-form input {
+      width: 100%;
+      padding: 0.9rem 1.25rem;
+      font-family: inherit;
+      font-size: 1rem;
+      background: #fcf3e3;
+      color: #121212;
+      border: 3px solid #121212;
+      border-radius: 0.5rem;
+    }
+    .lookup-form button[disabled] { opacity: 0.5; cursor: not-allowed; }
+    .status { margin-top: 1.25rem; font-weight: 600; }
+    .mp-details { margin-top: 1.25rem; }
+    .mp-details dt { font-weight: 700; margin-top: 0.75rem; }
+    .mp-details dd { margin-left: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Find my MP</h1>
+      <p class="tagline">Standalone test page — not wired into the finder</p>
+    </div>
+  </header>
+  <main>
+    <section aria-labelledby="lookup-heading">
+      <h2 id="lookup-heading" tabindex="-1">Look up your MP</h2>
+
+      <form class="lookup-form" id="lookup-form">
+        <label for="postcode">Your postcode</label>
+        <input id="postcode" name="postcode" type="text" autocomplete="postal-code" placeholder="e.g. SW1A 1AA">
+        <button type="submit" id="lookup-btn" class="choice-btn">Find my MP</button>
+      </form>
+
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <dl class="mp-details" id="mp-details"></dl>
+    </section>
+  </main>
+
+  <footer>
+    <p>tbfighters.org</p>
+  </footer>
+
+  <script>
+    // Endpoints confirmed against https://members-api.parliament.uk/swagger/v1/swagger.json
+    //   GET /api/Members/Search?Location={constituency}&House=Commons&IsCurrentMember=true
+    //   GET /api/Members/{id}/Contact
+    const POSTCODES_API = 'https://api.postcodes.io/postcodes/';
+    const MEMBERS_API = 'https://members-api.parliament.uk/api/';
+    const GENERIC_ERROR = "We couldn't find that postcode. Check it and try again.";
+
+    const form = document.getElementById('lookup-form');
+    const input = document.getElementById('postcode');
+    const button = document.getElementById('lookup-btn');
+    const status = document.getElementById('status');
+    const details = document.getElementById('mp-details');
+
+    async function fetchJson(url, label) {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`${label} failed: ${res.status} ${res.statusText} (${url})`);
+      }
+      return res.json();
+    }
+
+    async function lookupMp(postcode) {
+      const postcodeData = await fetchJson(
+        POSTCODES_API + encodeURIComponent(postcode),
+        'Postcode lookup'
+      );
+
+      const constituency = postcodeData.result.parliamentary_constituency_2024;
+      if (!constituency) {
+        throw new Error(`No 2024 constituency for postcode "${postcode}"`);
+      }
+
+      const searchUrl = MEMBERS_API + 'Members/Search'
+        + '?Location=' + encodeURIComponent(constituency)
+        + '&House=Commons&IsCurrentMember=true';
+      const searchData = await fetchJson(searchUrl, 'Member search');
+
+      const member = searchData.items && searchData.items[0] && searchData.items[0].value;
+      if (!member) {
+        throw new Error(`No current MP returned for constituency "${constituency}"`);
+      }
+
+      const contactData = await fetchJson(
+        MEMBERS_API + 'Members/' + member.id + '/Contact',
+        'Contact lookup'
+      );
+
+      const contacts = contactData.value || [];
+      const withEmail = contacts.find(c => c.email);
+      const withPhone = contacts.find(c => c.phone);
+
+      return {
+        constituency,
+        name: member.nameDisplayAs,
+        party: member.latestParty && member.latestParty.name,
+        email: withEmail && withEmail.email,
+        phone: withPhone && withPhone.phone,
+      };
+    }
+
+    function renderMp(mp) {
+      details.textContent = '';
+      const rows = [
+        ['Constituency', mp.constituency],
+        ['MP', mp.name],
+        ['Party', mp.party],
+        ['Email', mp.email],
+        ['Phone', mp.phone],
+      ];
+      rows.forEach(([label, value]) => {
+        const dt = document.createElement('dt');
+        dt.textContent = label;
+        const dd = document.createElement('dd');
+        dd.textContent = value || 'Not listed';
+        details.appendChild(dt);
+        details.appendChild(dd);
+      });
+    }
+
+    function setLoading(isLoading) {
+      button.disabled = isLoading;
+      button.textContent = isLoading ? 'Looking up…' : 'Find my MP';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      details.textContent = '';
+      status.textContent = 'Looking up your MP…';
+      setLoading(true);
+
+      try {
+        const mp = await lookupMp(input.value.trim());
+        status.textContent = '';
+        renderMp(mp);
+      } catch (err) {
+        // Page shows one plain message; the specific cause goes to the console.
+        console.error(err);
+        status.textContent = GENERIC_ERROR;
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
