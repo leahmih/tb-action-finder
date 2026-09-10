@@ -24,6 +24,24 @@
     .mp-details { margin-top: 1.25rem; }
     .mp-details dt { font-weight: 700; margin-top: 0.75rem; }
     .mp-details dd { margin-left: 0; }
+    .letter-subject { margin-top: 1.5rem; font-weight: 700; }
+    .letter-body {
+      display: block;
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.9rem 1.25rem;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.5;
+      background: #fcf3e3;
+      color: #121212;
+      border: 3px solid #121212;
+      border-radius: 0.5rem;
+      overflow-y: hidden;
+      resize: vertical;
+    }
+    /* display:block above outranks the UA [hidden] rule, so restate it. */
+    .letter-body[hidden] { display: none; }
   </style>
 </head>
 <body>
@@ -45,6 +63,9 @@
 
       <p class="status" id="status" role="status" aria-live="polite"></p>
       <dl class="mp-details" id="mp-details"></dl>
+
+      <p class="letter-subject" id="letter-subject" hidden></p>
+      <textarea class="letter-body" id="letter-body" aria-label="Draft message to your MP" hidden></textarea>
     </section>
   </main>
 
@@ -61,12 +82,15 @@
     const NOT_FOUND_ERROR = "We couldn't find that postcode. Check it and try again.";
     const UNAVAILABLE_ERROR = "We couldn't reach the MP lookup right now.";
     const FIND_YOUR_MP_URL = 'https://members.parliament.uk/FindYourMP';
+    const LETTER_URL = 'uk-letter.json';
 
     const form = document.getElementById('lookup-form');
     const input = document.getElementById('postcode');
     const button = document.getElementById('lookup-btn');
     const status = document.getElementById('status');
     const details = document.getElementById('mp-details');
+    const letterSubject = document.getElementById('letter-subject');
+    const letterBody = document.getElementById('letter-body');
 
     function apiError(message, kind) {
       const err = new Error(message);
@@ -119,12 +143,16 @@
       const withEmail = contacts.find(c => c.email);
       const withPhone = contacts.find(c => c.phone);
 
+      const letter = await fetchJson(LETTER_URL, 'Letter template');
+
       return {
         constituency,
         name: member.nameDisplayAs,
+        addressAs: member.nameAddressAs,
         party: member.latestParty && member.latestParty.name,
         email: withEmail && withEmail.email,
         phone: withPhone && withPhone.phone,
+        letter,
       };
     }
 
@@ -145,6 +173,29 @@
         details.appendChild(dt);
         details.appendChild(dd);
       });
+    }
+
+    function renderLetter(mp) {
+      const body = mp.letter.body
+        .replace(/\{\{mp_name\}\}/g, mp.addressAs || mp.name || '')
+        .replace(/\{\{constituency\}\}/g, mp.constituency);
+
+      letterSubject.textContent = mp.letter.subject;
+      letterBody.value = body;
+      letterSubject.hidden = false;
+      letterBody.hidden = false;
+
+      // Grow to fit so the whole message is visible without scrolling.
+      letterBody.rows = body.split('\n').length;
+      letterBody.style.height = 'auto';
+      letterBody.style.height = letterBody.scrollHeight + 'px';
+    }
+
+    function clearLetter() {
+      letterSubject.textContent = '';
+      letterBody.value = '';
+      letterSubject.hidden = true;
+      letterBody.hidden = true;
     }
 
     function showError(kind) {
@@ -169,6 +220,7 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       details.textContent = '';
+      clearLetter();
       status.textContent = 'Looking up your MP…';
       setLoading(true);
 
@@ -176,6 +228,7 @@
         const mp = await lookupMp(input.value.trim());
         status.textContent = '';
         renderMp(mp);
+        renderLetter(mp);
       } catch (err) {
         // Page shows a message chosen by err.kind; the specific cause goes to the console.
         console.error(err);
