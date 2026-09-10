@@ -58,7 +58,9 @@
     //   GET /api/Members/{id}/Contact
     const POSTCODES_API = 'https://api.postcodes.io/postcodes/';
     const MEMBERS_API = 'https://members-api.parliament.uk/api/';
-    const GENERIC_ERROR = "We couldn't find that postcode. Check it and try again.";
+    const NOT_FOUND_ERROR = "We couldn't find that postcode. Check it and try again.";
+    const UNAVAILABLE_ERROR = "We couldn't reach the MP lookup right now.";
+    const FIND_YOUR_MP_URL = 'https://members.parliament.uk/FindYourMP';
 
     const form = document.getElementById('lookup-form');
     const input = document.getElementById('postcode');
@@ -66,10 +68,22 @@
     const status = document.getElementById('status');
     const details = document.getElementById('mp-details');
 
-    async function fetchJson(url, label) {
-      const res = await fetch(url);
+    function apiError(message, kind) {
+      const err = new Error(message);
+      err.kind = kind;
+      return err;
+    }
+
+    async function fetchJson(url, label, kindFor404) {
+      let res;
+      try {
+        res = await fetch(url);
+      } catch (err) {
+        throw apiError(`${label} could not reach ${url}: ${err.message}`, 'network');
+      }
       if (!res.ok) {
-        throw new Error(`${label} failed: ${res.status} ${res.statusText} (${url})`);
+        const kind = res.status === 404 && kindFor404 ? kindFor404 : 'unavailable';
+        throw apiError(`${label} failed: ${res.status} ${res.statusText} (${url})`, kind);
       }
       return res.json();
     }
@@ -77,7 +91,8 @@
     async function lookupMp(postcode) {
       const postcodeData = await fetchJson(
         POSTCODES_API + encodeURIComponent(postcode),
-        'Postcode lookup'
+        'Postcode lookup',
+        'notfound'
       );
 
       const constituency = postcodeData.result.parliamentary_constituency_2024;
@@ -92,7 +107,7 @@
 
       const member = searchData.items && searchData.items[0] && searchData.items[0].value;
       if (!member) {
-        throw new Error(`No current MP returned for constituency "${constituency}"`);
+        throw apiError(`No current MP returned for constituency "${constituency}"`, 'unavailable');
       }
 
       const contactData = await fetchJson(
@@ -132,6 +147,20 @@
       });
     }
 
+    function showError(kind) {
+      if (kind === 'notfound') {
+        status.textContent = NOT_FOUND_ERROR;
+        return;
+      }
+      status.textContent = UNAVAILABLE_ERROR + ' ';
+      const link = document.createElement('a');
+      link.href = FIND_YOUR_MP_URL;
+      link.textContent = 'Find your MP on the Parliament website';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      status.appendChild(link);
+    }
+
     function setLoading(isLoading) {
       button.disabled = isLoading;
       button.textContent = isLoading ? 'Looking up…' : 'Find my MP';
@@ -148,9 +177,9 @@
         status.textContent = '';
         renderMp(mp);
       } catch (err) {
-        // Page shows one plain message; the specific cause goes to the console.
+        // Page shows a message chosen by err.kind; the specific cause goes to the console.
         console.error(err);
-        status.textContent = GENERIC_ERROR;
+        showError(err.kind);
       } finally {
         setLoading(false);
       }
