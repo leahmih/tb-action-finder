@@ -22,8 +22,13 @@
 6. **API unreachable** — `TypeError: Failed to fetch`. Identical whether
    wifi is off or the API is down; the browser cannot tell them apart, so
    the message must not blame either.
-7. **Names** — use `nameAddressAs` for the salutation, `nameDisplayAs` on
-   the card. Don't build title logic; Parliament has already solved it.
+7. **Names** — use `nameAddressAs || nameDisplayAs` for the salutation.
+   A census of all 649 current Commons MPs found 456 (70.3%) have
+   nameAddressAs: null, so it cannot be used alone. nameDisplayAs already
+   includes honorifics ("Dame Meg Hillier"), so the fallback reads
+   correctly. Register is inconsistent across the populated 30% ("Ms
+   Abbott" vs "Dr Rosena Allin-Khan" vs plain names) — harmless, since no
+   user sees more than one letter. Don't build your own title logic.
 
 ## Investigated and closed
 
@@ -63,14 +68,15 @@ Node testing.
 
 ## Known gaps
 
-- Network failure currently shows the "couldn't find that postcode"
-  message. Wrong and misleading. — Day 3
-- `BS1 5TR` (Carla Denyer) has an email but no phone number. "Email but no
-  phone" is a normal state, not an error. — Day 4
 - Northern Ireland postcodes return a real MP, but Sinn Féin MPs don't take
   their Westminster seats. Content decision, needs TBFighters input. — Day 3
 - Parliament member search took 1.07s on a cold request. Loading state is
   required, not optional.
+- **No letter copy exists.** V1 routed to other people's pages, so
+  TBFighters own no template text. uk-letter.json currently holds a
+  marked placeholder body. The same is likely true for the Danaher email
+  (Day 7). This is a content dependency on TBFighters, not in the 42-hour
+  estimate, and the longest-lead item before launch.
 
 ## Gotchas
 
