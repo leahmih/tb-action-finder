@@ -39,6 +39,28 @@ cache disabled, all 200. Not reproduced. Treat as closed unless new
 **browser-side** evidence appears. Do not add a proxy on the strength of
 Node testing.
 
+## Open decisions
+
+- **Northern Ireland — explained variant chosen.** Sinn Féin MPs do not take
+  their seats in the Commons (7 of NI's 18 constituencies; the other 11
+  behave normally). Decision: detect by party, show a note on the card and
+  swap the ask. Detection keys on `latestParty.name` from the member search;
+  the party list lives in actions.json, not in JS.
+
+  Card note (placeholder — Leah's draft, needs TBFighters sign-off):
+  "Your MP is a member of Sinn Féin, whose MPs do not take their seats in
+  the House of Commons. This message asks them to raise TB funding with UK
+  ministers directly."
+
+  Adjusted ask (same status):
+  "I am asking you to write to the Foreign Secretary and the Minister for
+  Development urging the UK to maintain its funding for tuberculosis
+  programmes, including its pledge to the Global Fund."
+
+  Both are Option A of two drafted. Rejected: doing nothing (letter asks for
+  something the MP won't do), and excluding NI (removes 11 working
+  constituencies to handle 7).
+
 ## Known gaps
 
 - Network failure currently shows the "couldn't find that postcode"
