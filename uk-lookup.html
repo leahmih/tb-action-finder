@@ -42,6 +42,16 @@
     }
     /* display:block above outranks the UA [hidden] rule, so restate it. */
     .letter-body[hidden] { display: none; }
+    .letter-note {
+      margin-top: 1.5rem;
+      padding: 0.7rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #3f3a31;
+      background: #f6ead3;
+      border-left: 3px solid #cbbb98;
+      border-radius: 0.25rem;
+    }
   </style>
 </head>
 <body>
@@ -176,9 +186,23 @@
     }
 
     function renderLetter(mp) {
+      const abstentionistParties = mp.letter.abstentionist_parties || [];
+      const variant = abstentionistParties.indexOf(mp.party) !== -1
+        ? mp.letter.abstentionist
+        : null;
+
+      if (variant) {
+        const note = document.createElement('p');
+        note.className = 'letter-note';
+        note.id = 'letter-note';
+        note.textContent = variant.card_note;
+        letterSubject.parentNode.insertBefore(note, letterSubject);
+      }
+
       const body = mp.letter.body
         .replace(/\{\{mp_name\}\}/g, mp.addressAs || mp.name || '')
-        .replace(/\{\{constituency\}\}/g, mp.constituency);
+        .replace(/\{\{constituency\}\}/g, mp.constituency)
+        .replace(/\{\{ask\}\}/g, variant ? variant.ask : mp.letter.ask);
 
       letterSubject.textContent = mp.letter.subject;
       letterBody.value = body;
@@ -192,6 +216,8 @@
     }
 
     function clearLetter() {
+      const note = document.getElementById('letter-note');
+      if (note) note.remove();
       letterSubject.textContent = '';
       letterBody.value = '';
       letterSubject.hidden = true;

@@ -1,4 +1,11 @@
 {
   "subject": "Please protect UK funding for tuberculosis programmes",
-  "body": "Dear {{mp_name}},\n\nI am writing as your constituent in {{constituency}}.\n\n[PLACEHOLDER — standard letter body to be written]\n\nI am asking you to urge the UK government to maintain its funding for tuberculosis programmes, including its pledge to the Global Fund.\n\nYours sincerely,"
+  "body": "Dear {{mp_name}},\n\nI am writing as your constituent in {{constituency}}.\n\n[PLACEHOLDER — standard letter body to be written]\n\n{{ask}}\n\nYours sincerely,",
+  "ask": "I am asking you to urge the UK government to maintain its funding for tuberculosis programmes, including its pledge to the Global Fund.",
+  "abstentionist_parties": ["Sinn Féin"],
+  "abstentionist": {
+    "copy_status": "PLACEHOLDER — Leah's Option A draft (see NOTES.md 'Open decisions'), not signed off by TBFighters. Applies to both strings below.",
+    "card_note": "Your MP is a member of Sinn Féin, whose MPs do not take their seats in the House of Commons. This message asks them to raise TB funding with UK ministers directly.",
+    "ask": "I am asking you to write to the Foreign Secretary and the Minister for Development urging the UK to maintain its funding for tuberculosis programmes, including its pledge to the Global Fund."
+  }
 }
