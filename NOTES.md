@@ -30,6 +30,20 @@
    Abbott" vs "Dr Rosena Allin-Khan" vs plain names) — harmless, since no
    user sees more than one letter. Don't build your own title logic.
 
+## Letter template shape (uk-letter.json)
+
+- `subject` — plain string, shown above the textarea.
+- `body` — the letter, with three placeholders: `{{mp_name}}`,
+  `{{constituency}}` and `{{ask}}`. Substituted before display.
+- `ask` — the standard ask, substituted into `{{ask}}`.
+- `abstentionist_parties` — list of `latestParty.name` values matched
+  exactly (not by substring). Read from the JSON; no party name is
+  hardcoded in the JS.
+- `abstentionist` — `{ copy_status, card_note, ask }`. When the member's
+  party matches, its `ask` replaces the standard one and `card_note`
+  renders above the subject line. When it doesn't match, no note element
+  exists in the DOM at all.
+
 ## Investigated and closed
 
 **Intermittent CORS on the Parliament API.** Claude Code reported that
