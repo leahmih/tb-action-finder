@@ -42,6 +42,10 @@
     }
     /* display:block above outranks the UA [hidden] rule, so restate it. */
     .letter-body[hidden] { display: none; }
+    .letter-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+    .letter-actions[hidden] { display: none; }
+    .letter-actions .choice-btn { width: calc(100% / 3); }
+    .copy-error { flex-basis: 100%; text-align: center; font-weight: 600; }
     .letter-note {
       margin-top: 1.5rem;
       padding: 0.7rem 1rem;
@@ -76,6 +80,10 @@
 
       <p class="letter-subject" id="letter-subject" hidden></p>
       <textarea class="letter-body" id="letter-body" aria-label="Draft message to your MP" hidden></textarea>
+      <div class="letter-actions" id="letter-actions" hidden>
+        <button type="button" class="choice-btn" id="copy-btn">Copy text</button>
+        <p class="copy-error" id="copy-error" role="alert" hidden>Couldn't copy automatically. Select the text above and copy it manually.</p>
+      </div>
     </section>
   </main>
 
@@ -101,6 +109,10 @@
     const details = document.getElementById('mp-details');
     const letterSubject = document.getElementById('letter-subject');
     const letterBody = document.getElementById('letter-body');
+    const letterActions = document.getElementById('letter-actions');
+    const copyBtn = document.getElementById('copy-btn');
+    const copyError = document.getElementById('copy-error');
+    let copiedTimer;
 
     function apiError(message, kind) {
       const err = new Error(message);
@@ -209,6 +221,22 @@
       letterSubject.hidden = false;
       letterBody.hidden = false;
 
+      if (mp.email) {
+        const emailBtn = document.createElement('button');
+        emailBtn.type = 'button';
+        emailBtn.className = 'choice-btn';
+        emailBtn.id = 'email-btn';
+        emailBtn.textContent = 'Open in email';
+        emailBtn.addEventListener('click', () => {
+          // Read the textarea at click time so the user's edits are sent.
+          window.location.href = 'mailto:' + mp.email
+            + '?subject=' + encodeURIComponent(mp.letter.subject)
+            + '&body=' + encodeURIComponent(letterBody.value);
+        });
+        copyBtn.after(emailBtn);
+      }
+      letterActions.hidden = false;
+
       // Grow to fit so the whole message is visible without scrolling.
       letterBody.rows = body.split('\n').length;
       letterBody.style.height = 'auto';
@@ -222,7 +250,32 @@
       letterBody.value = '';
       letterSubject.hidden = true;
       letterBody.hidden = true;
+      const emailBtn = document.getElementById('email-btn');
+      if (emailBtn) emailBtn.remove();
+      resetCopyButton();
+      copyError.hidden = true;
+      letterActions.hidden = true;
     }
+
+    function resetCopyButton() {
+      clearTimeout(copiedTimer);
+      copyBtn.textContent = 'Copy text';
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(letterBody.value);
+      } catch (err) {
+        console.error(err);
+        resetCopyButton();
+        copyError.hidden = false;
+        return;
+      }
+      copyError.hidden = true;
+      copyBtn.textContent = 'Copied';
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(resetCopyButton, 2000);
+    });
 
     function showError(kind) {
       if (kind === 'notfound') {
