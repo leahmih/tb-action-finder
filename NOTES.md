@@ -44,6 +44,14 @@
   renders above the subject line. When it doesn't match, no note element
   exists in the DOM at all.
 
+**Changed in the NI work (c394f55, 11 Sep 2026).** Before it, the file held
+only `subject` and `body`, with the ask sentence written inline in `body` and
+two placeholders (`{{mp_name}}`, `{{constituency}}`). The ask moved into its
+own `ask` field behind a new `{{ask}}` token so the abstentionist variant can
+swap it; `abstentionist_parties` and `abstentionist` were added in the same
+commit. Real letter copy must keep `{{ask}}` in the body — if the ask is
+written inline, Sinn Féin MPs still get the card note but the standard ask.
+
 ## Investigated and closed
 
 **Intermittent CORS on the Parliament API.** Claude Code reported that
@@ -91,6 +99,15 @@ Node testing.
   marked placeholder body. The same is likely true for the Danaher email
   (Day 7). This is a content dependency on TBFighters, not in the 42-hour
   estimate, and the longest-lead item before launch.
+- **Letter buttons wrap on phones.** "Copy text" and "Open in email" are
+  each 1/3 of the column width. At a 375px viewport that is about 125px, so
+  "Open in email" wraps onto two lines ("Open in" / "email"). Both buttons
+  still sit side by side and work. Possible fix, not done: keep 1/3 on
+  desktop, widen on small screens. Seen in a headless Chrome screenshot at
+  375px, not on a real phone.
+- **Letter buttons tested in one mail setup only.** Tested by hand in the
+  macOS Mail app with a Gmail account. Not tested with other mail apps,
+  webmail set as the mailto handler, Windows, or phones.
 
 ## Gotchas
 
