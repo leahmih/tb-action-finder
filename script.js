@@ -86,7 +86,8 @@ function generateICSContent(action) {
 
   const uid = `${action.id}-${now.getTime()}@tb-action-finder`;
   const nudge = action.weeklyNudge || 'Take action again this week.';
-  const desc = escapeICS(`${nudge}\n${action.actionUrl}`);
+  // A letter action has no actionUrl: the action happens inside the card.
+  const desc = escapeICS(action.letter ? nudge : `${nudge}\n${action.actionUrl}`);
   const summary = escapeICS(`TB action: ${action.title}`);
 
   const lines = [
@@ -119,6 +120,298 @@ function downloadICS(filename, content) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// --- Embedded rep-contact component ---
+// Ported from uk-lookup.html. Rendered inside the card of an action that has
+// a "letter" object. Each card holds references to its own elements instead
+// of page-wide IDs, so the markup can't collide with the rest of the page.
+
+// Endpoints confirmed against https://members-api.parliament.uk/swagger/v1/swagger.json
+//   GET /api/Members/Search?Location={constituency}&House=Commons&IsCurrentMember=true
+//   GET /api/Members/{id}/Contact
+const POSTCODES_API = 'https://api.postcodes.io/postcodes/';
+const MEMBERS_API = 'https://members-api.parliament.uk/api/';
+const NOT_FOUND_ERROR = "We couldn't find that postcode. Check it and try again.";
+const UNAVAILABLE_ERROR = "We couldn't reach the MP lookup right now.";
+const FIND_YOUR_MP_URL = 'https://members.parliament.uk/FindYourMP';
+const COPY_ERROR = "Couldn't copy automatically. Select the text above and copy it manually.";
+
+function apiError(message, kind) {
+  const err = new Error(message);
+  err.kind = kind;
+  return err;
+}
+
+async function fetchJson(url, label, kindFor404) {
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (err) {
+    throw apiError(`${label} could not reach ${url}: ${err.message}`, 'network');
+  }
+  if (!res.ok) {
+    const kind = res.status === 404 && kindFor404 ? kindFor404 : 'unavailable';
+    throw apiError(`${label} failed: ${res.status} ${res.statusText} (${url})`, kind);
+  }
+  return res.json();
+}
+
+async function lookupMp(postcode, letter) {
+  const postcodeData = await fetchJson(
+    POSTCODES_API + encodeURIComponent(postcode),
+    'Postcode lookup',
+    'notfound'
+  );
+
+  const constituency = postcodeData.result.parliamentary_constituency_2024;
+  if (!constituency) {
+    throw new Error(`No 2024 constituency for postcode "${postcode}"`);
+  }
+
+  const searchUrl = MEMBERS_API + 'Members/Search'
+    + '?Location=' + encodeURIComponent(constituency)
+    + '&House=Commons&IsCurrentMember=true';
+  const searchData = await fetchJson(searchUrl, 'Member search');
+
+  const member = searchData.items && searchData.items[0] && searchData.items[0].value;
+  if (!member) {
+    throw apiError(`No current MP returned for constituency "${constituency}"`, 'unavailable');
+  }
+
+  const contactData = await fetchJson(
+    MEMBERS_API + 'Members/' + member.id + '/Contact',
+    'Contact lookup'
+  );
+
+  const contacts = contactData.value || [];
+  const withEmail = contacts.find(c => c.email);
+  const withPhone = contacts.find(c => c.phone);
+
+  return {
+    constituency,
+    name: member.nameDisplayAs,
+    addressAs: member.nameAddressAs,
+    party: member.latestParty && member.latestParty.name,
+    email: withEmail && withEmail.email,
+    phone: withPhone && withPhone.phone,
+    letter,
+  };
+}
+
+function createRepContact(action) {
+  const inputId = `rep-contact-${action.id}-postcode`;
+
+  const root = document.createElement('div');
+  root.className = 'rep-contact';
+
+  const form = document.createElement('form');
+  form.className = 'lookup-form';
+
+  const postcodeLabel = document.createElement('label');
+  postcodeLabel.htmlFor = inputId;
+  postcodeLabel.textContent = 'Your postcode';
+
+  const input = document.createElement('input');
+  input.id = inputId;
+  input.name = 'postcode';
+  input.type = 'text';
+  input.setAttribute('autocomplete', 'postal-code');
+  input.placeholder = 'e.g. SW1A 1AA';
+
+  const button = document.createElement('button');
+  button.type = 'submit';
+  button.className = 'choice-btn';
+  button.textContent = 'Find my MP';
+
+  form.appendChild(postcodeLabel);
+  form.appendChild(input);
+  form.appendChild(button);
+
+  const status = document.createElement('p');
+  status.className = 'status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+
+  const details = document.createElement('dl');
+  details.className = 'mp-details';
+
+  const letterSubject = document.createElement('p');
+  letterSubject.className = 'letter-subject';
+  letterSubject.hidden = true;
+
+  const letterBody = document.createElement('textarea');
+  letterBody.className = 'letter-body';
+  letterBody.setAttribute('aria-label', 'Draft message to your MP');
+  letterBody.hidden = true;
+
+  const letterActions = document.createElement('div');
+  letterActions.className = 'letter-actions';
+  letterActions.hidden = true;
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'choice-btn';
+  copyBtn.textContent = 'Copy text';
+
+  const copyError = document.createElement('p');
+  copyError.className = 'copy-error';
+  copyError.setAttribute('role', 'alert');
+  copyError.textContent = COPY_ERROR;
+  copyError.hidden = true;
+
+  letterActions.appendChild(copyBtn);
+  letterActions.appendChild(copyError);
+
+  root.appendChild(form);
+  root.appendChild(status);
+  root.appendChild(details);
+  root.appendChild(letterSubject);
+  root.appendChild(letterBody);
+  root.appendChild(letterActions);
+
+  let letterNote = null;
+  let emailBtn = null;
+  let copiedTimer;
+
+  function renderMp(mp) {
+    details.textContent = '';
+    const rows = [
+      ['Constituency', mp.constituency],
+      ['MP', mp.name],
+      ['Party', mp.party],
+      ['Email', mp.email],
+      ['Phone', mp.phone],
+    ];
+    rows.forEach(([label, value]) => {
+      const dt = document.createElement('dt');
+      dt.textContent = label;
+      const dd = document.createElement('dd');
+      dd.textContent = value || 'Not listed';
+      details.appendChild(dt);
+      details.appendChild(dd);
+    });
+  }
+
+  function renderLetter(mp) {
+    const abstentionistParties = mp.letter.abstentionist_parties || [];
+    const variant = abstentionistParties.indexOf(mp.party) !== -1
+      ? mp.letter.abstentionist
+      : null;
+
+    if (variant) {
+      letterNote = document.createElement('p');
+      letterNote.className = 'letter-note';
+      letterNote.textContent = variant.card_note;
+      letterSubject.parentNode.insertBefore(letterNote, letterSubject);
+    }
+
+    const body = mp.letter.body
+      .replace(/\{\{mp_name\}\}/g, mp.addressAs || mp.name || '')
+      .replace(/\{\{constituency\}\}/g, mp.constituency)
+      .replace(/\{\{ask\}\}/g, variant ? variant.ask : mp.letter.ask);
+
+    letterSubject.textContent = mp.letter.subject;
+    letterBody.value = body;
+    letterSubject.hidden = false;
+    letterBody.hidden = false;
+
+    if (mp.email) {
+      emailBtn = document.createElement('button');
+      emailBtn.type = 'button';
+      emailBtn.className = 'choice-btn';
+      emailBtn.textContent = 'Open in email';
+      emailBtn.addEventListener('click', () => {
+        // Read the textarea at click time so the user's edits are sent.
+        window.location.href = 'mailto:' + mp.email
+          + '?subject=' + encodeURIComponent(mp.letter.subject)
+          + '&body=' + encodeURIComponent(letterBody.value);
+      });
+      copyBtn.after(emailBtn);
+    }
+    letterActions.hidden = false;
+
+    // Grow to fit so the whole message is visible without scrolling.
+    letterBody.rows = body.split('\n').length;
+    letterBody.style.height = 'auto';
+    letterBody.style.height = letterBody.scrollHeight + 'px';
+  }
+
+  function clearLetter() {
+    if (letterNote) letterNote.remove();
+    letterNote = null;
+    letterSubject.textContent = '';
+    letterBody.value = '';
+    letterSubject.hidden = true;
+    letterBody.hidden = true;
+    if (emailBtn) emailBtn.remove();
+    emailBtn = null;
+    resetCopyButton();
+    copyError.hidden = true;
+    letterActions.hidden = true;
+  }
+
+  function resetCopyButton() {
+    clearTimeout(copiedTimer);
+    copyBtn.textContent = 'Copy text';
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(letterBody.value);
+    } catch (err) {
+      console.error(err);
+      resetCopyButton();
+      copyError.hidden = false;
+      return;
+    }
+    copyError.hidden = true;
+    copyBtn.textContent = 'Copied';
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(resetCopyButton, 2000);
+  });
+
+  function showError(kind) {
+    if (kind === 'notfound') {
+      status.textContent = NOT_FOUND_ERROR;
+      return;
+    }
+    status.textContent = UNAVAILABLE_ERROR + ' ';
+    const link = document.createElement('a');
+    link.href = FIND_YOUR_MP_URL;
+    link.textContent = 'Find your MP on the Parliament website';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    status.appendChild(link);
+  }
+
+  function setLoading(isLoading) {
+    button.disabled = isLoading;
+    button.textContent = isLoading ? 'Looking up…' : 'Find my MP';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    details.textContent = '';
+    clearLetter();
+    status.textContent = 'Looking up your MP…';
+    setLoading(true);
+
+    try {
+      const mp = await lookupMp(input.value.trim(), action.letter);
+      status.textContent = '';
+      renderMp(mp);
+      renderLetter(mp);
+    } catch (err) {
+      // Page shows a message chosen by err.kind; the specific cause goes to the console.
+      console.error(err);
+      showError(err.kind);
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  return root;
 }
 
 // --- Render ---
@@ -180,7 +473,8 @@ function renderResults() {
 
     const actions_row = document.createElement('div');
     actions_row.className = 'card-actions';
-    actions_row.appendChild(primaryBtn);
+    // A letter action happens inside the card, so it gets no Take action button.
+    if (!action.letter) actions_row.appendChild(primaryBtn);
     actions_row.appendChild(learnMoreLink);
     actions_row.appendChild(signupBtn);
 
@@ -197,6 +491,7 @@ function renderResults() {
 
     card.appendChild(title);
     card.appendChild(blurb);
+    if (action.letter) card.appendChild(createRepContact(action));
     card.appendChild(actions_row);
     list.appendChild(card);
   });

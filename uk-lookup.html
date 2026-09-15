@@ -100,7 +100,8 @@
     const NOT_FOUND_ERROR = "We couldn't find that postcode. Check it and try again.";
     const UNAVAILABLE_ERROR = "We couldn't reach the MP lookup right now.";
     const FIND_YOUR_MP_URL = 'https://members.parliament.uk/FindYourMP';
-    const LETTER_URL = 'uk-letter.json';
+    const ACTIONS_URL = 'actions.json';
+    const LETTER_ACTION_ID = 'uk-funding';
 
     const form = document.getElementById('lookup-form');
     const input = document.getElementById('postcode');
@@ -165,7 +166,12 @@
       const withEmail = contacts.find(c => c.email);
       const withPhone = contacts.find(c => c.phone);
 
-      const letter = await fetchJson(LETTER_URL, 'Letter template');
+      const actionsData = await fetchJson(ACTIONS_URL, 'Actions data');
+      const letterAction = (actionsData.actions || []).find(a => a.id === LETTER_ACTION_ID);
+      if (!letterAction || !letterAction.letter) {
+        throw apiError(`No letter on action "${LETTER_ACTION_ID}" in ${ACTIONS_URL}`, 'unavailable');
+      }
+      const letter = letterAction.letter;
 
       return {
         constituency,

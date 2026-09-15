@@ -1,5 +1,27 @@
 # V2 build notes
 
+## Where things stand (15 Sep 2026)
+
+- **Letter data moved.** The UK letter now lives in the `letter` object on
+  the `uk-funding` entry in actions.json (9e84ee9). uk-letter.json is
+  deleted.
+- **Engine not yet updated.** script.js has no `letter` handling and still
+  reads `actionUrl` for the card's main link (script.js:154) and the weekly
+  reminder text (script.js:89).
+- **UK card in the main tool is currently broken.** `uk-funding` no longer
+  has `actionUrl`, so its "Take action" link points to `undefined` and its
+  weekly reminder text ends in "undefined". Worked out from script.js, not
+  checked in a browser.
+- **uk-lookup.html is now the only reader of the letter data.** It loads
+  actions.json and reads the `letter` object on `uk-funding`.
+
+**Next session: engine change in script.js.** Render a `rep_contact` action
+as an embedded component when it has a `letter` object, and as a link via
+`actionUrl` otherwise. `pepfar-funding`, `ca-funding` and `dear-colleague`
+have no `letter` and must keep routing out exactly as they do now. Also
+needs a decision: the weekly reminder text uses `actionUrl`, which
+`uk-funding` no longer has.
+
 ## Spike findings (Day 1)
 
 1. **CORS** — both APIs allow browser requests. postcodes.io returns
@@ -30,7 +52,7 @@
    Abbott" vs "Dr Rosena Allin-Khan" vs plain names) — harmless, since no
    user sees more than one letter. Don't build your own title logic.
 
-## Letter template shape (uk-letter.json)
+## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
 - `body` — the letter, with three placeholders: `{{mp_name}}`,
@@ -44,8 +66,8 @@
   renders above the subject line. When it doesn't match, no note element
   exists in the DOM at all.
 
-**Changed in the NI work (c394f55, 11 Sep 2026).** Before it, the file held
-only `subject` and `body`, with the ask sentence written inline in `body` and
+**Changed in the NI work (c394f55, 11 Sep 2026).** Before it, uk-letter.json
+held only `subject` and `body`, with the ask sentence written inline in `body` and
 two placeholders (`{{mp_name}}`, `{{constituency}}`). The ask moved into its
 own `ask` field behind a new `{{ask}}` token so the abstentionist variant can
 swap it; `abstentionist_parties` and `abstentionist` were added in the same
@@ -96,8 +118,8 @@ Node testing.
 - Parliament member search took 1.07s on a cold request. Loading state is
   required, not optional.
 - **No letter copy exists.** V1 routed to other people's pages, so
-  TBFighters own no template text. uk-letter.json currently holds a
-  marked placeholder body. The same is likely true for the Danaher email
+  TBFighters own no template text. `uk-funding.letter` in actions.json
+  currently holds a marked placeholder body. The same is likely true for the Danaher email
   (Day 7). This is a content dependency on TBFighters, not in the 42-hour
   estimate, and the longest-lead item before launch.
 - **Letter buttons wrap on phones.** "Copy text" and "Open in email" are

@@ -249,6 +249,114 @@ body > header h1:focus-visible {
   box-shadow: 0 0 0 4px #121212;
 }
 
+/* ---- Embedded rep-contact component (ported from uk-lookup.html) ---- */
+.rep-contact {
+  margin-bottom: 1.25rem;
+}
+
+.rep-contact .lookup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rep-contact .lookup-form label {
+  font-weight: 600;
+}
+
+.rep-contact .lookup-form input {
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  font-family: inherit;
+  font-size: 1rem;
+  background: #fcf3e3;
+  color: #121212;
+  border: 3px solid #121212;
+  border-radius: 0.5rem;
+}
+
+.rep-contact .lookup-form button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rep-contact .status {
+  margin-top: 1.25rem;
+  font-weight: 600;
+}
+
+.rep-contact .mp-details {
+  margin-top: 1.25rem;
+}
+
+.rep-contact .mp-details dt {
+  font-weight: 700;
+  margin-top: 0.75rem;
+}
+
+.rep-contact .mp-details dd {
+  margin-left: 0;
+}
+
+.rep-contact .letter-note {
+  margin-top: 1.5rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #3f3a31;
+  background: #f6ead3;
+  border-left: 3px solid #cbbb98;
+  border-radius: 0.25rem;
+}
+
+.rep-contact .letter-subject {
+  margin-top: 1.5rem;
+  font-weight: 700;
+}
+
+.rep-contact .letter-body {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  background: #fcf3e3;
+  color: #121212;
+  border: 3px solid #121212;
+  border-radius: 0.5rem;
+  overflow-y: hidden;
+  resize: vertical;
+}
+
+/* display:block above outranks the UA [hidden] rule, so restate it. */
+.rep-contact .letter-body[hidden] {
+  display: none;
+}
+
+.rep-contact .letter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.rep-contact .letter-actions[hidden] {
+  display: none;
+}
+
+.rep-contact .letter-actions .choice-btn {
+  width: calc(100% / 3);
+}
+
+.rep-contact .copy-error {
+  flex-basis: 100%;
+  text-align: center;
+  font-weight: 600;
+}
+
 /* ---- Footer ---- */
 body > footer {
   max-width: 540px;
