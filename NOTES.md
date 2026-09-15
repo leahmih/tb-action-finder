@@ -72,7 +72,8 @@ Node testing.
   their seats in the Commons (7 of NI's 18 constituencies; the other 11
   behave normally). Decision: detect by party, show a note on the card and
   swap the ask. Detection keys on `latestParty.name` from the member search;
-  the party list lives in actions.json, not in JS.
+  the party list lives in the letter data (`abstentionist_parties`), not at
+  the top level of actions.json, and not in JS.
 
   Card note (placeholder — Leah's draft, needs TBFighters sign-off):
   "Your MP is a member of Sinn Féin, whose MPs do not take their seats in
