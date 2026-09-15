@@ -2,25 +2,17 @@
 
 ## Where things stand (15 Sep 2026)
 
-- **Letter data moved.** The UK letter now lives in the `letter` object on
-  the `uk-funding` entry in actions.json (9e84ee9). uk-letter.json is
-  deleted.
-- **Engine not yet updated.** script.js has no `letter` handling and still
-  reads `actionUrl` for the card's main link (script.js:154) and the weekly
-  reminder text (script.js:89).
-- **UK card in the main tool is currently broken.** `uk-funding` no longer
-  has `actionUrl`, so its "Take action" link points to `undefined` and its
-  weekly reminder text ends in "undefined". Worked out from script.js, not
-  checked in a browser.
-- **uk-lookup.html is now the only reader of the letter data.** It loads
-  actions.json and reads the `letter` object on `uk-funding`.
+Day 6 complete. The rep-contact component renders inside the UK card in
+the real tool (index.html). script.js branches on whether an action has a
+"letter" object, not on type — so pepfar-funding, ca-funding and
+dear-colleague still route out via actionUrl. Verified: all 17 non-letter
+card renders across all 12 country/time combinations identical to the
+previous commit. Letter data lives in actions.json under uk-funding;
+uk-letter.json deleted.
 
-**Next session: engine change in script.js.** Render a `rep_contact` action
-as an embedded component when it has a `letter` object, and as a link via
-`actionUrl` otherwise. `pepfar-funding`, `ca-funding` and `dear-colleague`
-have no `letter` and must keep routing out exactly as they do now. Also
-needs a decision: the weekly reminder text uses `actionUrl`, which
-`uk-funding` no longer has.
+## Day 8 — CSS pass
+
+- there are way too many buttons on postcode finder cards
 
 ## Spike findings (Day 1)
 
@@ -128,9 +120,22 @@ Node testing.
   still sit side by side and work. Possible fix, not done: keep 1/3 on
   desktop, widen on small screens. Seen in a headless Chrome screenshot at
   375px, not on a real phone.
+  **Worse inside the card (Day 6).** In index.html the buttons are 1/3 of
+  the narrower card width, so "Open in email" wraps at desktop width too,
+  and at 375px both labels wrap ("Copy / text", "Open / in / email"). Seen
+  in headless Chrome screenshots of the card at 800px and 375px. Relevant
+  to the Day 8 CSS pass.
 - **Letter buttons tested in one mail setup only.** Tested by hand in the
   macOS Mail app with a Gmail account. Not tested with other mail apps,
   webmail set as the mailto handler, Windows, or phones.
+- **Duplicated component code.** uk-lookup.html still contains its own
+  copy of the lookup and letter logic; script.js now has the real one.
+  A fix to one won't reach the other. Kept deliberately as a visual
+  reference for the Day 8 CSS pass. DELETE uk-lookup.html once the card
+  styling is done.
+- **Not tested by hand at scale.** Day 6's regression checks ran in
+  headless Chrome with the network mocked. Real-service testing so far is
+  E8 2NG, BT12 6AA, banana, and one real mailto click.
 
 ## Gotchas
 
