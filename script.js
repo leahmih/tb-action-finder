@@ -199,11 +199,142 @@ async function lookupMp(postcode, letter) {
   };
 }
 
-function createRepContact(action) {
-  const inputId = `rep-contact-${action.id}-postcode`;
+// The subject line, the editable letter and the Copy / Open in email buttons.
+// Shared by both letter flows: appended to the card's root, then filled in by
+// render() with whatever recipient the flow produced.
+function createLetterPanel(root, bodyLabel) {
+  const letterSubject = document.createElement('p');
+  letterSubject.className = 'letter-subject';
+  letterSubject.hidden = true;
 
-  const root = document.createElement('div');
-  root.className = 'rep-contact';
+  const letterBody = document.createElement('textarea');
+  letterBody.className = 'letter-body';
+  letterBody.setAttribute('aria-label', bodyLabel);
+  letterBody.hidden = true;
+
+  const letterActions = document.createElement('div');
+  letterActions.className = 'letter-actions';
+  letterActions.hidden = true;
+
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'choice-btn';
+  copyBtn.textContent = 'Copy text';
+
+  const copyError = document.createElement('p');
+  copyError.className = 'copy-error';
+  copyError.setAttribute('role', 'alert');
+  copyError.textContent = COPY_ERROR;
+  copyError.hidden = true;
+
+  letterActions.appendChild(copyBtn);
+  letterActions.appendChild(copyError);
+
+  root.appendChild(letterSubject);
+  root.appendChild(letterBody);
+  root.appendChild(letterActions);
+
+  let letterNote = null;
+  let emailBtn = null;
+  let copiedTimer;
+
+  function resetCopyButton() {
+    clearTimeout(copiedTimer);
+    copyBtn.textContent = 'Copy text';
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(letterBody.value);
+    } catch (err) {
+      console.error(err);
+      resetCopyButton();
+      copyError.hidden = false;
+      return;
+    }
+    copyError.hidden = true;
+    copyBtn.textContent = 'Copied';
+    clearTimeout(copiedTimer);
+    copiedTimer = setTimeout(resetCopyButton, 2000);
+  });
+
+  // Grow to fit so the whole message is visible without scrolling.
+  function autosize() {
+    letterBody.rows = letterBody.value.split('\n').length;
+    letterBody.style.height = 'auto';
+    letterBody.style.height = letterBody.scrollHeight + 'px';
+  }
+
+  // recipient: { letter, email, name, addressAs, constituency, party }. Only
+  // letter and email are needed; the rest come from an MP lookup when there
+  // is one, and the placeholders they fill are optional in the letter body.
+  function render(recipient) {
+    const letter = recipient.letter;
+    const abstentionistParties = letter.abstentionist_parties || [];
+    const variant = abstentionistParties.indexOf(recipient.party) !== -1
+      ? letter.abstentionist
+      : null;
+
+    if (variant) {
+      letterNote = document.createElement('p');
+      letterNote.className = 'letter-note';
+      letterNote.textContent = variant.card_note;
+      letterSubject.parentNode.insertBefore(letterNote, letterSubject);
+    }
+
+    const body = letter.body
+      .replace(/\{\{mp_name\}\}/g, recipient.addressAs || recipient.name || '')
+      .replace(/\{\{constituency\}\}/g, recipient.constituency || '')
+      .replace(/\{\{ask\}\}/g, variant ? variant.ask : letter.ask);
+
+    letterSubject.textContent = letter.subject;
+    letterBody.value = body;
+    letterSubject.hidden = false;
+    letterBody.hidden = false;
+
+    if (recipient.email) {
+      emailBtn = document.createElement('button');
+      emailBtn.type = 'button';
+      emailBtn.className = 'choice-btn';
+      emailBtn.textContent = 'Open in email';
+      emailBtn.addEventListener('click', () => {
+        // Read the textarea at click time so the user's edits are sent.
+        window.location.href = 'mailto:' + recipient.email
+          + '?subject=' + encodeURIComponent(letter.subject)
+          + '&body=' + encodeURIComponent(letterBody.value);
+      });
+      copyBtn.after(emailBtn);
+    }
+    letterActions.hidden = false;
+
+    // autosize needs layout, so a fixed-recipient letter — rendered while the
+    // card is still being built — has to wait until the card is in the page.
+    if (letterBody.isConnected) autosize();
+    else requestAnimationFrame(autosize);
+  }
+
+  function clear() {
+    if (letterNote) letterNote.remove();
+    letterNote = null;
+    letterSubject.textContent = '';
+    letterBody.value = '';
+    letterSubject.hidden = true;
+    letterBody.hidden = true;
+    if (emailBtn) emailBtn.remove();
+    emailBtn = null;
+    resetCopyButton();
+    copyError.hidden = true;
+    letterActions.hidden = true;
+  }
+
+  return { render, clear };
+}
+
+// The postcode form, the MP details list and the lookup that fills the letter
+// panel in. Prepended above the panel, so the letter still renders below the
+// form it came from.
+function addMpLookup(root, action, panel) {
+  const inputId = `rep-contact-${action.id}-postcode`;
 
   const form = document.createElement('form');
   form.className = 'lookup-form';
@@ -236,43 +367,7 @@ function createRepContact(action) {
   const details = document.createElement('dl');
   details.className = 'mp-details';
 
-  const letterSubject = document.createElement('p');
-  letterSubject.className = 'letter-subject';
-  letterSubject.hidden = true;
-
-  const letterBody = document.createElement('textarea');
-  letterBody.className = 'letter-body';
-  letterBody.setAttribute('aria-label', 'Draft message to your MP');
-  letterBody.hidden = true;
-
-  const letterActions = document.createElement('div');
-  letterActions.className = 'letter-actions';
-  letterActions.hidden = true;
-
-  const copyBtn = document.createElement('button');
-  copyBtn.type = 'button';
-  copyBtn.className = 'choice-btn';
-  copyBtn.textContent = 'Copy text';
-
-  const copyError = document.createElement('p');
-  copyError.className = 'copy-error';
-  copyError.setAttribute('role', 'alert');
-  copyError.textContent = COPY_ERROR;
-  copyError.hidden = true;
-
-  letterActions.appendChild(copyBtn);
-  letterActions.appendChild(copyError);
-
-  root.appendChild(form);
-  root.appendChild(status);
-  root.appendChild(details);
-  root.appendChild(letterSubject);
-  root.appendChild(letterBody);
-  root.appendChild(letterActions);
-
-  let letterNote = null;
-  let emailBtn = null;
-  let copiedTimer;
+  root.prepend(form, status, details);
 
   function renderMp(mp) {
     details.textContent = '';
@@ -292,84 +387,6 @@ function createRepContact(action) {
       details.appendChild(dd);
     });
   }
-
-  function renderLetter(mp) {
-    const abstentionistParties = mp.letter.abstentionist_parties || [];
-    const variant = abstentionistParties.indexOf(mp.party) !== -1
-      ? mp.letter.abstentionist
-      : null;
-
-    if (variant) {
-      letterNote = document.createElement('p');
-      letterNote.className = 'letter-note';
-      letterNote.textContent = variant.card_note;
-      letterSubject.parentNode.insertBefore(letterNote, letterSubject);
-    }
-
-    const body = mp.letter.body
-      .replace(/\{\{mp_name\}\}/g, mp.addressAs || mp.name || '')
-      .replace(/\{\{constituency\}\}/g, mp.constituency)
-      .replace(/\{\{ask\}\}/g, variant ? variant.ask : mp.letter.ask);
-
-    letterSubject.textContent = mp.letter.subject;
-    letterBody.value = body;
-    letterSubject.hidden = false;
-    letterBody.hidden = false;
-
-    if (mp.email) {
-      emailBtn = document.createElement('button');
-      emailBtn.type = 'button';
-      emailBtn.className = 'choice-btn';
-      emailBtn.textContent = 'Open in email';
-      emailBtn.addEventListener('click', () => {
-        // Read the textarea at click time so the user's edits are sent.
-        window.location.href = 'mailto:' + mp.email
-          + '?subject=' + encodeURIComponent(mp.letter.subject)
-          + '&body=' + encodeURIComponent(letterBody.value);
-      });
-      copyBtn.after(emailBtn);
-    }
-    letterActions.hidden = false;
-
-    // Grow to fit so the whole message is visible without scrolling.
-    letterBody.rows = body.split('\n').length;
-    letterBody.style.height = 'auto';
-    letterBody.style.height = letterBody.scrollHeight + 'px';
-  }
-
-  function clearLetter() {
-    if (letterNote) letterNote.remove();
-    letterNote = null;
-    letterSubject.textContent = '';
-    letterBody.value = '';
-    letterSubject.hidden = true;
-    letterBody.hidden = true;
-    if (emailBtn) emailBtn.remove();
-    emailBtn = null;
-    resetCopyButton();
-    copyError.hidden = true;
-    letterActions.hidden = true;
-  }
-
-  function resetCopyButton() {
-    clearTimeout(copiedTimer);
-    copyBtn.textContent = 'Copy text';
-  }
-
-  copyBtn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(letterBody.value);
-    } catch (err) {
-      console.error(err);
-      resetCopyButton();
-      copyError.hidden = false;
-      return;
-    }
-    copyError.hidden = true;
-    copyBtn.textContent = 'Copied';
-    clearTimeout(copiedTimer);
-    copiedTimer = setTimeout(resetCopyButton, 2000);
-  });
 
   function showError(kind) {
     if (kind === 'notfound') {
@@ -393,7 +410,7 @@ function createRepContact(action) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     details.textContent = '';
-    clearLetter();
+    panel.clear();
     status.textContent = 'Looking up your MP…';
     setLoading(true);
 
@@ -401,7 +418,7 @@ function createRepContact(action) {
       const mp = await lookupMp(input.value.trim(), action.letter);
       status.textContent = '';
       renderMp(mp);
-      renderLetter(mp);
+      panel.render(mp);
     } catch (err) {
       // Page shows a message chosen by err.kind; the specific cause goes to the console.
       console.error(err);
@@ -410,6 +427,22 @@ function createRepContact(action) {
       setLoading(false);
     }
   });
+}
+
+function createRepContact(action) {
+  const root = document.createElement('div');
+  root.className = 'rep-contact';
+
+  // A letter with a "to" address has a fixed recipient: nothing to look up, so
+  // the letter is there as soon as the card renders.
+  if (action.letter.to) {
+    createLetterPanel(root, 'Draft message').render({
+      letter: action.letter,
+      email: action.letter.to,
+    });
+  } else {
+    addMpLookup(root, action, createLetterPanel(root, 'Draft message to your MP'));
+  }
 
   return root;
 }
