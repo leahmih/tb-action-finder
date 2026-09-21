@@ -17,6 +17,8 @@ Remaining: delete uk-lookup.html.
 
 - there are way too many buttons on postcode finder cards — see "Button
   hierarchy on letter cards" under Known gaps.
+- the subject line is labelled but not editable, while the body under it
+  is. Decide whether it should become an input.
 
 ## Spike findings (Day 1)
 
@@ -113,11 +115,14 @@ Node testing.
   their Westminster seats. Content decision, needs TBFighters input. — Day 3
 - Parliament member search took 1.07s on a cold request. Loading state is
   required, not optional.
-- **No letter copy exists.** V1 routed to other people's pages, so
-  TBFighters own no template text. `uk-funding.letter` in actions.json
-  currently holds a marked placeholder body. The same is likely true for the Danaher email
-  (Day 7). This is a content dependency on TBFighters, not in the 42-hour
-  estimate, and the longest-lead item before launch.
+- **No UK letter copy exists.** `uk-funding.letter` in actions.json still
+  holds a marked placeholder body. A content dependency on TBFighters, not
+  in the 42-hour estimate, and the longest-lead item before launch.
+  **Danaher copy does exist (Day 7).** TBFighters' own Option 1 template
+  from tbfighters.org/templates/danaher is now inline in
+  `danaher-email.letter`. Option 2 was not used: it has gone stale, dating
+  a September 2023 commitment as "last year" and "a year later". Flag to
+  TBFighters — the same staleness will reach Option 1 eventually.
 - **Letter buttons wrap on phones.** "Copy text" and "Open in email" are
   each 1/3 of the column width. At a 375px viewport that is about 125px, so
   "Open in email" wraps onto two lines ("Open in" / "email"). Both buttons
@@ -146,9 +151,10 @@ Node testing.
   button; they weren't re-examined when the card gained an inline flow.
   Product question: which of the three belong on letter cards, and should
   they look like the action buttons at all?
-- **Layout with multiple tall cards.** Once Danaher is inline, two long
-  interactive cards will stack in the centre column alongside short link
-  cards. Revisit after Day 7 when real card heights are known.
+- **Layout with multiple tall cards.** Live now, not hypothetical: the
+  Danaher textarea renders 893px tall at 800px width, so a UK user gets two
+  tall interactive cards stacked in the centre column alongside short link
+  cards. Needs a real look at the results screen as a whole.
 
 ## Gotchas
 
