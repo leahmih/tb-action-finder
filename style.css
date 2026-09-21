@@ -309,8 +309,13 @@ body > header h1:focus-visible {
   border-radius: 0.25rem;
 }
 
-.rep-contact .letter-subject {
+/* Label above the subject, matching the .mp-details field labels. */
+.rep-contact .letter-subject-label {
   margin-top: 1.5rem;
+  font-weight: 700;
+}
+
+.rep-contact .letter-subject {
   font-weight: 700;
 }
 

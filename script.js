@@ -203,6 +203,13 @@ async function lookupMp(postcode, letter) {
 // Shared by both letter flows: appended to the card's root, then filled in by
 // render() with whatever recipient the flow produced.
 function createLetterPanel(root, bodyLabel) {
+  // Kept separate from the subject text so that only the subject itself ends
+  // up in the mailto and in anything the user copies.
+  const letterSubjectLabel = document.createElement('p');
+  letterSubjectLabel.className = 'letter-subject-label';
+  letterSubjectLabel.textContent = 'Subject line:';
+  letterSubjectLabel.hidden = true;
+
   const letterSubject = document.createElement('p');
   letterSubject.className = 'letter-subject';
   letterSubject.hidden = true;
@@ -230,6 +237,7 @@ function createLetterPanel(root, bodyLabel) {
   letterActions.appendChild(copyBtn);
   letterActions.appendChild(copyError);
 
+  root.appendChild(letterSubjectLabel);
   root.appendChild(letterSubject);
   root.appendChild(letterBody);
   root.appendChild(letterActions);
@@ -279,7 +287,7 @@ function createLetterPanel(root, bodyLabel) {
       letterNote = document.createElement('p');
       letterNote.className = 'letter-note';
       letterNote.textContent = variant.card_note;
-      letterSubject.parentNode.insertBefore(letterNote, letterSubject);
+      letterSubjectLabel.parentNode.insertBefore(letterNote, letterSubjectLabel);
     }
 
     const body = letter.body
@@ -289,6 +297,7 @@ function createLetterPanel(root, bodyLabel) {
 
     letterSubject.textContent = letter.subject;
     letterBody.value = body;
+    letterSubjectLabel.hidden = false;
     letterSubject.hidden = false;
     letterBody.hidden = false;
 
@@ -318,6 +327,7 @@ function createLetterPanel(root, bodyLabel) {
     letterNote = null;
     letterSubject.textContent = '';
     letterBody.value = '';
+    letterSubjectLabel.hidden = true;
     letterSubject.hidden = true;
     letterBody.hidden = true;
     if (emailBtn) emailBtn.remove();
