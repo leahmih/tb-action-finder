@@ -12,7 +12,11 @@ uk-letter.json deleted.
 
 ## Day 8 — CSS pass
 
-- there are way too many buttons on postcode finder cards
+CSS pass largely done — the card fits the tool's design after a hard reload.
+Remaining: delete uk-lookup.html.
+
+- there are way too many buttons on postcode finder cards — see "Button
+  hierarchy on letter cards" under Known gaps.
 
 ## Spike findings (Day 1)
 
@@ -136,6 +140,15 @@ Node testing.
 - **Not tested by hand at scale.** Day 6's regression checks ran in
   headless Chrome with the network mocked. Real-service testing so far is
   E8 2NG, BT12 6AA, banana, and one real mailto click.
+- **Button hierarchy on letter cards.** The UK card shows five buttons:
+  Copy, Open in email, then Learn more, email signup and weekly reminder.
+  The last three are a V1 decision made when every card had one primary
+  button; they weren't re-examined when the card gained an inline flow.
+  Product question: which of the three belong on letter cards, and should
+  they look like the action buttons at all?
+- **Layout with multiple tall cards.** Once Danaher is inline, two long
+  interactive cards will stack in the centre column alongside short link
+  cards. Revisit after Day 7 when real card heights are known.
 
 ## Gotchas
 
@@ -143,3 +156,6 @@ Node testing.
   visible text back over the file. This destroyed `uk-lookup.html` once.
   Use `cat`, or VS Code.
 - Commit as soon as anything works, not when a step is finished.
+- Inexplicably input-specific failures during development are usually
+  cache (the URL is the cache key). Hard reload first. Keep "Disable cache"
+  ticked in the Network panel while devtools is open.
