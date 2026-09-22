@@ -20,6 +20,21 @@ Remaining: delete uk-lookup.html.
 - the subject line is labelled but not editable, while the body under it
   is. Decide whether it should become an input.
 
+## UK letter copy landed (22 Sep 2026)
+
+Leah's copy replaced the placeholder body. The letter now asks MPs to join
+the APPG on Global Tuberculosis, so `subject` changed to match.
+
+Structural point worth keeping: the paragraph explaining what the APPG is
+lives in `ask`, not in `body`. It was in the body at first, but the body is
+shared with the abstentionist variant, which asks for something else
+entirely — Sinn Féin constituents were getting a letter that explained the
+APPG and then never mentioned it. Anything that only makes sense for one
+variant belongs in that variant's `ask`, not in the shared body.
+
+Both copy blocks are marked draft pending TBFighters sign-off. See Known
+gaps.
+
 ## Spike findings (Day 1)
 
 1. **CORS** — both APIs allow browser requests. postcodes.io returns
@@ -59,10 +74,15 @@ Remaining: delete uk-lookup.html.
 - `abstentionist_parties` — list of `latestParty.name` values matched
   exactly (not by substring). Read from the JSON; no party name is
   hardcoded in the JS.
-- `abstentionist` — `{ copy_status, card_note, ask }`. When the member's
-  party matches, its `ask` replaces the standard one and `card_note`
-  renders above the subject line. When it doesn't match, no note element
-  exists in the DOM at all.
+- `abstentionist` — `{ copy_status, card_note, ask, subject }`. When the
+  member's party matches, its `ask` replaces the standard one and
+  `card_note` renders above the subject line. When it doesn't match, no note
+  element exists in the DOM at all.
+- `abstentionist.subject` is optional: the variant uses it when present and
+  falls back to the letter's own `subject` when absent. The card and the
+  mailto read the same resolved subject, so they can't drift apart. Added
+  22 Sep 2026, when the standard subject ("join the APPG") stopped matching
+  the abstentionist ask.
 
 **Changed in the NI work (c394f55, 11 Sep 2026).** Before it, uk-letter.json
 held only `subject` and `body`, with the ask sentence written inline in `body` and
@@ -95,17 +115,22 @@ Node testing.
   the party list lives in the letter data (`abstentionist_parties`), not at
   the top level of actions.json, and not in JS.
 
-  Card note (placeholder — Leah's draft, needs TBFighters sign-off):
+  Card note (Leah's draft, still needs TBFighters sign-off):
   "Your MP is a member of Sinn Féin, whose MPs do not take their seats in
   the House of Commons. This message asks them to raise TB funding with UK
   ministers directly."
 
-  Adjusted ask (same status):
+  Adjusted ask (same status, rewritten 22 Sep 2026):
   "I am asking you to write to the Foreign Secretary and the Minister for
-  Development urging the UK to maintain its funding for tuberculosis
-  programmes, including its pledge to the Global Fund."
+  Development urging the UK to protect its funding for the global TB
+  response, including its £850 million pledge to the Global Fund, as the
+  aid budget is cut."
 
-  Both are Option A of two drafted. Rejected: doing nothing (letter asks for
+  Own subject line (same status, added 22 Sep 2026):
+  "Please protect UK funding for the global TB response"
+
+  The card note is Option A of two drafted; the ask started as Option A and
+  was rewritten on 22 Sep. Rejected: doing nothing (letter asks for
   something the MP won't do), and excluding NI (removes 11 working
   constituencies to handle 7).
 
@@ -115,9 +140,12 @@ Node testing.
   their Westminster seats. Content decision, needs TBFighters input. — Day 3
 - Parliament member search took 1.07s on a cold request. Loading state is
   required, not optional.
-- **No UK letter copy exists.** `uk-funding.letter` in actions.json still
-  holds a marked placeholder body. A content dependency on TBFighters, not
-  in the 42-hour estimate, and the longest-lead item before launch.
+- **UK letter copy is drafted but unsigned-off (22 Sep 2026).** The
+  placeholder body in `uk-funding.letter` is gone: Leah's copy is now in
+  actions.json, marked `copy_status: "draft — Leah's copy, pending
+  TBFighters sign-off"` on both the standard letter and the abstentionist
+  block. Still a content dependency on TBFighters, but no longer a blank —
+  what's outstanding is approval, not writing.
   **Danaher copy does exist (Day 7).** TBFighters' own Option 1 template
   from tbfighters.org/templates/danaher is now inline in
   `danaher-email.letter`. Option 2 was not used: it has gone stale, dating
