@@ -13,7 +13,7 @@ uk-letter.json deleted.
 ## Day 8 — CSS pass
 
 CSS pass largely done — the card fits the tool's design after a hard reload.
-Remaining: delete uk-lookup.html.
+uk-lookup.html deleted (22 Sep 2026) — script.js is the only implementation.
 
 - there are way too many buttons on postcode finder cards — see "Button
   hierarchy on letter cards" under Known gaps.
@@ -165,11 +165,6 @@ Node testing.
 - **Letter buttons tested in one mail setup only.** Tested by hand in the
   macOS Mail app with a Gmail account. Not tested with other mail apps,
   webmail set as the mailto handler, Windows, or phones.
-- **Duplicated component code.** uk-lookup.html still contains its own
-  copy of the lookup and letter logic; script.js now has the real one.
-  A fix to one won't reach the other. Kept deliberately as a visual
-  reference for the Day 8 CSS pass. DELETE uk-lookup.html once the card
-  styling is done.
 - **Not tested by hand at scale.** Day 6's regression checks ran in
   headless Chrome with the network mocked. Real-service testing so far is
   E8 2NG, BT12 6AA, banana, and one real mailto click.
