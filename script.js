@@ -295,7 +295,11 @@ function createLetterPanel(root, bodyLabel) {
       .replace(/\{\{constituency\}\}/g, recipient.constituency || '')
       .replace(/\{\{ask\}\}/g, variant ? variant.ask : letter.ask);
 
-    letterSubject.textContent = letter.subject;
+    // The abstentionist variant may carry its own subject; fall back to the
+    // letter's when it doesn't.
+    const subject = (variant && variant.subject) || letter.subject;
+
+    letterSubject.textContent = subject;
     letterBody.value = body;
     letterSubjectLabel.hidden = false;
     letterSubject.hidden = false;
@@ -309,7 +313,7 @@ function createLetterPanel(root, bodyLabel) {
       emailBtn.addEventListener('click', () => {
         // Read the textarea at click time so the user's edits are sent.
         window.location.href = 'mailto:' + recipient.email
-          + '?subject=' + encodeURIComponent(letter.subject)
+          + '?subject=' + encodeURIComponent(subject)
           + '&body=' + encodeURIComponent(letterBody.value);
       });
       copyBtn.after(emailBtn);

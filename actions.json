@@ -47,14 +47,16 @@
       "learnMore": "https://tbfighters.org/action",
       "weeklyNudge": "Set a weekly reminder — repeated contact from constituents is what moves MPs.",
       "letter": {
-        "subject": "Please protect UK funding for tuberculosis programmes",
-        "body": "Dear {{mp_name}},\n\nI am writing as your constituent in {{constituency}}.\n\n[PLACEHOLDER — standard letter body to be written]\n\n{{ask}}\n\nYours sincerely,",
-        "ask": "I am asking you to urge the UK government to maintain its funding for tuberculosis programmes, including its pledge to the Global Fund.",
+        "subject": "Please join the APPG on Global Tuberculosis",
+        "body": "Dear {{mp_name}},\n\nI am writing as your constituent in {{constituency}}.\n\nTuberculosis is now the world’s deadliest infectious disease, and it is rising here in the UK too. It is preventable and curable, yet it still kills more than a million people a year worldwide.\n\n{{ask}}\n\nYours sincerely,",
+        "ask": "Parliament’s All-Party Parliamentary Group on Global Tuberculosis works to push the Government to improve its TB policies and commit more resources to ending the epidemic. In March 2026, it published the findings of an inquiry into rising TB rates in the UK.\n\nIf you are not already a member, I am asking you to join the All-Party Parliamentary Group on Global Tuberculosis, and to support its recommendations for strengthening the UK’s response to TB.",
+        "copy_status": "draft — Leah's copy, pending TBFighters sign-off",
         "abstentionist_parties": ["Sinn Féin"],
         "abstentionist": {
-          "copy_status": "PLACEHOLDER — Leah's Option A draft (see NOTES.md 'Open decisions'), not signed off by TBFighters. Applies to both strings below.",
+          "copy_status": "draft — Leah's copy (card note, ask and subject), pending TBFighters sign-off",
+          "subject": "Please protect UK funding for the global TB response",
           "card_note": "Your MP is a member of Sinn Féin, whose MPs do not take their seats in the House of Commons. This message asks them to raise TB funding with UK ministers directly.",
-          "ask": "I am asking you to write to the Foreign Secretary and the Minister for Development urging the UK to maintain its funding for tuberculosis programmes, including its pledge to the Global Fund."
+          "ask": "I am asking you to write to the Foreign Secretary and the Minister for Development urging the UK to protect its funding for the global TB response, including its £850 million pledge to the Global Fund, as the aid budget is cut."
         }
       }
     },
