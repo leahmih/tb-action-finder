@@ -43,6 +43,13 @@
   </main>
 
   <footer>
+    <!-- href and visibility come from emailSignupUrl in actions.json, so a
+         failed load leaves no dead link behind. -->
+    <p class="footer-signup" hidden>
+      <a id="email-signup-link" class="footer-signup-link" target="_blank"
+         rel="noopener noreferrer"
+         aria-label="Sign up for TBFighters emails (opens in new tab)">Sign up for TBFighters emails</a>
+    </p>
     <p>tbfighters.org</p>
     <p class="footer-updated">Last reviewed: 3 July 2026</p>
   </footer>

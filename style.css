@@ -376,6 +376,30 @@ body > footer {
   border-top: 2px solid #dddad4;
 }
 
+.footer-signup {
+  margin-bottom: 0.6rem;
+}
+
+.footer-signup-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #bc1c1a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer-signup-link:hover {
+  color: #121212;
+}
+
+.footer-signup-link:focus-visible {
+  outline: 3px solid #121212;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 .footer-updated {
   margin-top: 0.35rem;
   font-size: 0.65rem;
@@ -430,6 +454,11 @@ body > footer {
   /* Give the Learn more link a generous tap area */
   .link-secondary {
     display: block;
+    padding: 0.35rem 0;
+  }
+
+  .footer-signup-link {
+    display: inline-block;
     padding: 0.35rem 0;
   }
 }

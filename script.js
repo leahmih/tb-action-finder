@@ -8,8 +8,18 @@ fetch('actions.json')
   .then(data => {
     actions = data.actions;
     emailSignupUrl = data.emailSignupUrl;
+    renderFooterSignup();
   })
   .catch(err => console.error('Failed to load actions.json:', err));
+
+// Shown once in the footer rather than on every card. Revealed only when
+// actions.json supplied a URL.
+function renderFooterSignup() {
+  const link = document.getElementById('email-signup-link');
+  if (!link || !emailSignupUrl) return;
+  link.href = emailSignupUrl;
+  link.closest('.footer-signup').hidden = false;
+}
 
 const screens = {
   country: document.getElementById('screen-country'),
@@ -510,20 +520,11 @@ function renderResults() {
     learnMoreLink.rel = 'noopener noreferrer';
     learnMoreLink.setAttribute('aria-label', `Learn more about ${action.title} (opens in new tab)`);
 
-    const signupBtn = document.createElement('a');
-    signupBtn.href = emailSignupUrl;
-    signupBtn.textContent = 'Sign up for TBFighters emails';
-    signupBtn.className = 'btn-secondary';
-    signupBtn.target = '_blank';
-    signupBtn.rel = 'noopener noreferrer';
-    signupBtn.setAttribute('aria-label', 'Sign up for TBFighters emails (opens in new tab)');
-
     const actions_row = document.createElement('div');
     actions_row.className = 'card-actions';
     // A letter action happens inside the card, so it gets no Take action button.
     if (!action.letter) actions_row.appendChild(primaryBtn);
     actions_row.appendChild(learnMoreLink);
-    actions_row.appendChild(signupBtn);
 
     if (chosenTimeBucket === 'weekly') {
       const reminderBtn = document.createElement('button');
