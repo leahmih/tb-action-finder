@@ -276,8 +276,11 @@ function createLetterPanel(root, bodyLabel) {
     copiedTimer = setTimeout(resetCopyButton, 2000);
   });
 
-  // Grow to fit so the whole message is visible without scrolling.
+  // Grow to fit so the whole message is visible without scrolling. A hidden
+  // textarea has no scrollHeight, so this waits until the card is expanded —
+  // see the toggle in renderResults.
   function autosize() {
+    if (letterBody.hidden || !letterBody.offsetParent) return;
     letterBody.rows = letterBody.value.split('\n').length;
     letterBody.style.height = 'auto';
     letterBody.style.height = letterBody.scrollHeight + 'px';
@@ -351,7 +354,7 @@ function createLetterPanel(root, bodyLabel) {
     letterActions.hidden = true;
   }
 
-  return { render, clear };
+  return { render, clear, autosize };
 }
 
 // The postcode form, the MP details list and the lookup that fills the letter
@@ -457,18 +460,21 @@ function createRepContact(action) {
   const root = document.createElement('div');
   root.className = 'rep-contact';
 
+  let panel;
   // A letter with a "to" address has a fixed recipient: nothing to look up, so
   // the letter is there as soon as the card renders.
   if (action.letter.to) {
-    createLetterPanel(root, 'Draft message').render({
+    panel = createLetterPanel(root, 'Draft message');
+    panel.render({
       letter: action.letter,
       email: action.letter.to,
     });
   } else {
-    addMpLookup(root, action, createLetterPanel(root, 'Draft message to your MP'));
+    panel = createLetterPanel(root, 'Draft message to your MP');
+    addMpLookup(root, action, panel);
   }
 
-  return root;
+  return { root, autosize: panel.autosize };
 }
 
 // --- Render ---
@@ -539,7 +545,33 @@ function renderResults() {
 
     card.appendChild(title);
     card.appendChild(blurb);
-    if (action.letter) card.appendChild(createRepContact(action));
+
+    // A letter card opens on demand: the panel is built up front but hidden,
+    // so a half-written letter or a completed MP lookup survives a collapse.
+    if (action.letter) {
+      const repContact = createRepContact(action);
+      repContact.root.id = `rep-contact-${action.id}`;
+      repContact.root.hidden = true;
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'btn-primary card-toggle';
+      toggle.textContent = 'Write the letter';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-controls', repContact.root.id);
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        toggle.textContent = expanded ? 'Write the letter' : 'Hide the letter';
+        repContact.root.hidden = expanded;
+        // The textarea could not measure itself while hidden.
+        if (!expanded) repContact.autosize();
+      });
+
+      card.appendChild(toggle);
+      card.appendChild(repContact.root);
+    }
+
     card.appendChild(actions_row);
     list.appendChild(card);
   });

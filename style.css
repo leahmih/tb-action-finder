@@ -250,6 +250,12 @@ body > header h1:focus-visible {
 }
 
 /* ---- Embedded rep-contact component (ported from uk-lookup.html) ---- */
+/* Expand/collapse control on letter cards. Stands in for the Take action
+   button those cards don't have, so it carries the same weight. */
+.card-toggle {
+  margin-bottom: 1.25rem;
+}
+
 .rep-contact {
   margin-bottom: 1.25rem;
 }
