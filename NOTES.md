@@ -65,6 +65,25 @@ gaps.
    Abbott" vs "Dr Rosena Allin-Khan" vs plain names) — harmless, since no
    user sees more than one letter. Don't build your own title logic.
 
+## Letter cards collapse (23 Sep 2026)
+
+Letter cards render title, blurb and a "Write the letter" button; the panel
+(and the UK card's postcode lookup) is hidden until the user expands it. A
+real `<button>` with `aria-expanded` and `aria-controls`, so it works by
+keyboard. Cards are independent — more than one can be open.
+
+Collapsing sets `hidden` on the panel root; it never destroys and rebuilds
+it. A half-written letter and a completed MP lookup have to survive a
+collapse, and rebuilding would throw both away.
+
+**The gotcha: a hidden textarea has no scrollHeight.** `autosize()` measured
+the Danaher letter as 0px, because a fixed-recipient letter renders while
+the card is still being built — now hidden from the start. So `autosize()`
+no-ops while hidden and is re-run on expand, which is why
+`createLetterPanel` returns it and `createRepContact` returns
+`{ root, autosize }` rather than a bare node. Anything else that measures
+layout inside a letter panel will hit the same thing.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
@@ -178,10 +197,13 @@ Node testing.
   these and has moved to the footer as a text link — it pointed somewhere
   none of the card's own buttons went, and repeated on every card. Learn
   more and the weekly reminder were deliberately left alone.
-- **Layout with multiple tall cards.** Live now, not hypothetical: the
-  Danaher textarea renders 893px tall at 800px width, so a UK user gets two
-  tall interactive cards stacked in the centre column alongside short link
-  cards. Needs a real look at the results screen as a whole.
+- **Layout with multiple tall cards.** Was: the Danaher textarea renders
+  893px tall at 800px width, so a UK user got two tall interactive cards
+  stacked in the centre column alongside short link cards.
+  **Largely closed 23 Sep 2026** by collapsing letter cards — the results
+  screen now opens as a short, scannable list, and a card is only tall
+  while the user is working in it. What's left is the case where someone
+  opens both at once, which is now their choice rather than the default.
 
 ## Gotchas
 
