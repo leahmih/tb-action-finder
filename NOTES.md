@@ -168,12 +168,16 @@ Node testing.
 - **Not tested by hand at scale.** Day 6's regression checks ran in
   headless Chrome with the network mocked. Real-service testing so far is
   E8 2NG, BT12 6AA, banana, and one real mailto click.
-- **Button hierarchy on letter cards.** The UK card shows five buttons:
-  Copy, Open in email, then Learn more, email signup and weekly reminder.
-  The last three are a V1 decision made when every card had one primary
-  button; they weren't re-examined when the card gained an inline flow.
-  Product question: which of the three belong on letter cards, and should
-  they look like the action buttons at all?
+- **Button hierarchy on letter cards.** The UK card shows four buttons:
+  Copy, Open in email, then Learn more and weekly reminder. The last two
+  are a V1 decision made when every card had one primary button; they
+  weren't re-examined when the card gained an inline flow. Product
+  question: do they belong on letter cards, and should they look like the
+  action buttons at all?
+  **Partly addressed 23 Sep 2026.** The email signup was the third of
+  these and has moved to the footer as a text link — it pointed somewhere
+  none of the card's own buttons went, and repeated on every card. Learn
+  more and the weekly reminder were deliberately left alone.
 - **Layout with multiple tall cards.** Live now, not hypothetical: the
   Danaher textarea renders 893px tall at 800px width, so a UK user gets two
   tall interactive cards stacked in the centre column alongside short link
