@@ -84,6 +84,22 @@ no-ops while hidden and is re-run on expand, which is why
 `{ root, autosize }` rather than a bare node. Anything else that measures
 layout inside a letter panel will hit the same thing.
 
+## Day 11 — embed-friendliness
+
+Tested with a hostile host page (Georgia serif, content-box, lime buttons,
+dark background) iframing the tool at localhost:8001/host.html.
+
+- Iframes are a style boundary in both directions, so CSS scoping is NOT
+  needed for iframe embedding. Direct embedding (markup inlined into a
+  host page) is not supported — would need full CSS namespacing.
+- Loads fine, no X-Frame-Options issue.
+- mailto works from inside the iframe, opens the mail app directly.
+- Textarea and card layout render correctly at 700px container width.
+- ONLY real issue: the iframe has a fixed height, so the tool scrolls
+  inside it — 3-4 scrolls for an expanded card. Needs a postMessage height
+  signal, firing on every expand/collapse (ResizeObserver), not just once
+  on load.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
