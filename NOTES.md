@@ -99,6 +99,19 @@ dark background) iframing the tool at localhost:8001/host.html.
   inside it — 3-4 scrolls for an expanded card. Needs a postMessage height
   signal, firing on every expand/collapse (ResizeObserver), not just once
   on load.
+- **Height signal implemented (6 Oct 2026, 6626431).** When inside an
+  iframe, script.js adds a `tbaf-embedded` class to `<html>` and posts
+  `{ type: "tbaf:height", height: <px> }` to the parent, on load and on
+  every ResizeObserver change.
+- Two things had prevented shrinking: `documentElement.scrollHeight` never
+  reports less than the iframe's own height, and `body { min-height: 100dvh }`
+  resolves to the iframe's height when embedded. Fixed by measuring
+  `document.body.getBoundingClientRect().height` and adding
+  `.tbaf-embedded body { min-height: 0 }`. Standalone page keeps 100dvh.
+- Verified in real Chrome, cross-origin: 655 → 965 (UK tonight) → 1141
+  (expand letter) → 965 (collapse) → 655 (back to start).
+- Relative paths: nothing assumes the domain root. Verified by serving
+  from `/tools/action-finder/` locally in Chrome.
 
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
