@@ -608,3 +608,20 @@ document.querySelectorAll('[data-time]').forEach(btn => {
     showScreen('results');
   });
 });
+
+// When embedded in an iframe, tell the parent page how tall the content is
+// so it can size the iframe to fit. Cards expand and collapse, so this
+// re-posts on every body resize, not just once on load. Measures body's own
+// box rather than the document's scrollHeight, which never reports less than
+// the iframe's current height and so could only ever grow.
+if (window.parent !== window) {
+  document.documentElement.classList.add('tbaf-embedded');
+  const postHeight = () => {
+    window.parent.postMessage(
+      { type: 'tbaf:height', height: Math.ceil(document.body.getBoundingClientRect().height) },
+      '*'
+    );
+  };
+  window.addEventListener('load', postHeight);
+  new ResizeObserver(postHeight).observe(document.body);
+}

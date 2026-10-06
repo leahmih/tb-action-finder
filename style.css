@@ -21,6 +21,12 @@ body {
   padding: 0 0 4rem;
 }
 
+/* In an iframe, body must shrink to its content so the height signal in
+   script.js can report collapses. 100dvh there is the iframe's own height. */
+.tbaf-embedded body {
+  min-height: 0;
+}
+
 main {
   font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
   font-weight: 400;
