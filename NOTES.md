@@ -113,6 +113,27 @@ dark background) iframing the tool at localhost:8001/host.html.
 - Relative paths: nothing assumes the domain root. Verified by serving
   from `/tools/action-finder/` locally in Chrome.
 
+## Day 12 — analytics
+
+Instrumentation added 9 Oct 2026 (f2683fd). No provider wired up yet.
+
+- TBFighters already use Cloudflare Web Analytics (stated in their privacy
+  policy at tbfighters.org/privacy.html). V1's decision D4 was matching
+  what they run, not an independent choice.
+- Their privacy policy promises no cookies, no localStorage, no
+  fingerprinting, no data tied to an individual. Instrumentation stays
+  inside that: every event stands alone, no session ID, so no stitched
+  per-user funnel is possible.
+- Deliberately NOT creating a Cloudflare account. The account would be in
+  Leah's name and die at handoff. `track()` currently only console.logs,
+  with a marked comment showing where a provider call goes.
+- **HANDOFF:** add your Cloudflare Web Analytics token and wire it into
+  `track()` in script.js. One line, marked in the code.
+- Events: `results_rendered` (country, timeBucket), `letter_card_expanded`,
+  `mp_lookup_succeeded`, `mp_lookup_failed` (error kind),
+  `open_in_email_clicked`, `copy_text_clicked`, `outbound_link_clicked`,
+  `weekly_reminder_downloaded` — all with actionId where applicable.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
@@ -184,6 +205,11 @@ Node testing.
 
 ## Known gaps
 
+- **The tool's actions are out of date.** TBFighters' homepage currently
+  features Gilead/lenacapavir (HIV), the End TB Now Act of 2026, and a
+  NewMode congressional oversight link. The tool still has PEPFAR
+  apportionment and Tofu's map. Actions have moved on since V1. This is
+  the strongest argument for adding a reviewBy date to every action.
 - Northern Ireland postcodes return a real MP, but Sinn Féin MPs don't take
   their Westminster seats. Content decision, needs TBFighters input. — Day 3
 - Parliament member search took 1.07s on a cold request. Loading state is
