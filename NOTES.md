@@ -134,6 +134,23 @@ Instrumentation added 9 Oct 2026 (f2683fd). No provider wired up yet.
   `open_in_email_clicked`, `copy_text_clicked`, `outbound_link_clicked`,
   `weekly_reminder_downloaded` — all with actionId where applicable.
 
+## Day 13 — accessibility
+
+Keyboard pass: clean, no fixes needed. Verified with mouse untouched and
+macOS "Keyboard navigation" enabled:
+- Focus moves to the "Your actions" heading when results render.
+- Expand button keeps focus on expand; one Tab enters the panel.
+- Postcode submit, both action buttons, Learn more and the Parliament
+  fallback link in the error state are all reachable and operable.
+- Visible focus ring throughout.
+- Minor, not fixed: the letter textarea is tall, so focus lands at its top
+  and the cursor can sit below the fold. Typing scrolls it into view.
+- Note: Space does not activate links (Enter does). Correct browser
+  behaviour, not a bug.
+
+Still to do: aria-live regions for the status line, error states and the
+"Copied" confirmation, then VoiceOver testing.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
