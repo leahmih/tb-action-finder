@@ -3,6 +3,16 @@ let emailSignupUrl = '';
 let chosenCountry = null;
 let chosenTimeBucket = null;
 
+// --- Analytics ---
+// No provider is wired up yet, so events only go to the console. The privacy
+// policy promises no cookies, no localStorage and no data tied to an
+// individual: keep it that way. No session ID, no user ID, no client-side
+// state. Each event stands alone.
+function track(eventName, data = {}) {
+  console.log('[track]', eventName, data);
+  // >>> PROVIDER CALL GOES HERE, e.g. provider.track(eventName, data) <<<
+}
+
 fetch('actions.json')
   .then(res => res.json())
   .then(data => {
@@ -18,6 +28,9 @@ function renderFooterSignup() {
   const link = document.getElementById('email-signup-link');
   if (!link || !emailSignupUrl) return;
   link.href = emailSignupUrl;
+  link.addEventListener('click', () => {
+    track('outbound_link_clicked', { link: 'footer_signup', url: link.href });
+  });
   link.closest('.footer-signup').hidden = false;
 }
 
@@ -212,7 +225,7 @@ async function lookupMp(postcode, letter) {
 // The subject line, the editable letter and the Copy / Open in email buttons.
 // Shared by both letter flows: appended to the card's root, then filled in by
 // render() with whatever recipient the flow produced.
-function createLetterPanel(root, bodyLabel) {
+function createLetterPanel(root, bodyLabel, actionId) {
   // Kept separate from the subject text so that only the subject itself ends
   // up in the mailto and in anything the user copies.
   const letterSubjectLabel = document.createElement('p');
@@ -262,6 +275,7 @@ function createLetterPanel(root, bodyLabel) {
   }
 
   copyBtn.addEventListener('click', async () => {
+    track('copy_text_clicked', { actionId });
     try {
       await navigator.clipboard.writeText(letterBody.value);
     } catch (err) {
@@ -324,6 +338,7 @@ function createLetterPanel(root, bodyLabel) {
       emailBtn.className = 'choice-btn';
       emailBtn.textContent = 'Open in email';
       emailBtn.addEventListener('click', () => {
+        track('open_in_email_clicked', { actionId });
         // Read the textarea at click time so the user's edits are sent.
         window.location.href = 'mailto:' + recipient.email
           + '?subject=' + encodeURIComponent(subject)
@@ -426,6 +441,9 @@ function addMpLookup(root, action, panel) {
     link.textContent = 'Find your MP on the Parliament website';
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
+    link.addEventListener('click', () => {
+      track('outbound_link_clicked', { link: 'find_your_mp', actionId: action.id, url: link.href });
+    });
     status.appendChild(link);
   }
 
@@ -446,10 +464,12 @@ function addMpLookup(root, action, panel) {
       status.textContent = '';
       renderMp(mp);
       panel.render(mp);
+      track('mp_lookup_succeeded', { actionId: action.id });
     } catch (err) {
       // Page shows a message chosen by err.kind; the specific cause goes to the console.
       console.error(err);
       showError(err.kind);
+      track('mp_lookup_failed', { actionId: action.id, errorKind: err.kind || 'unknown' });
     } finally {
       setLoading(false);
     }
@@ -464,13 +484,13 @@ function createRepContact(action) {
   // A letter with a "to" address has a fixed recipient: nothing to look up, so
   // the letter is there as soon as the card renders.
   if (action.letter.to) {
-    panel = createLetterPanel(root, 'Draft message');
+    panel = createLetterPanel(root, 'Draft message', action.id);
     panel.render({
       letter: action.letter,
       email: action.letter.to,
     });
   } else {
-    panel = createLetterPanel(root, 'Draft message to your MP');
+    panel = createLetterPanel(root, 'Draft message to your MP', action.id);
     addMpLookup(root, action, panel);
   }
 
@@ -517,6 +537,9 @@ function renderResults() {
     primaryBtn.target = '_blank';
     primaryBtn.rel = 'noopener noreferrer';
     primaryBtn.setAttribute('aria-label', `${primaryLabel}: ${action.title} (opens in new tab)`);
+    primaryBtn.addEventListener('click', () => {
+      track('outbound_link_clicked', { link: 'primary', actionId: action.id, url: primaryBtn.href });
+    });
 
     const learnMoreLink = document.createElement('a');
     learnMoreLink.href = action.learnMore;
@@ -525,6 +548,9 @@ function renderResults() {
     learnMoreLink.target = '_blank';
     learnMoreLink.rel = 'noopener noreferrer';
     learnMoreLink.setAttribute('aria-label', `Learn more about ${action.title} (opens in new tab)`);
+    learnMoreLink.addEventListener('click', () => {
+      track('outbound_link_clicked', { link: 'learn_more', actionId: action.id, url: learnMoreLink.href });
+    });
 
     const actions_row = document.createElement('div');
     actions_row.className = 'card-actions';
@@ -539,6 +565,7 @@ function renderResults() {
       reminderBtn.setAttribute('aria-label', `Set a weekly reminder for ${action.title}`);
       reminderBtn.addEventListener('click', () => {
         downloadICS(`tb-action-${action.id}.ics`, generateICSContent(action));
+        track('weekly_reminder_downloaded', { actionId: action.id });
       });
       actions_row.appendChild(reminderBtn);
     }
@@ -565,7 +592,10 @@ function renderResults() {
         toggle.textContent = expanded ? 'Write the letter' : 'Hide the letter';
         repContact.root.hidden = expanded;
         // The textarea could not measure itself while hidden.
-        if (!expanded) repContact.autosize();
+        if (!expanded) {
+          repContact.autosize();
+          track('letter_card_expanded', { actionId: action.id });
+        }
       });
 
       card.appendChild(toggle);
@@ -606,6 +636,7 @@ document.querySelectorAll('[data-time]').forEach(btn => {
     chosenTimeBucket = btn.dataset.time;
     renderResults();
     showScreen('results');
+    track('results_rendered', { country: chosenCountry, timeBucket: chosenTimeBucket });
   });
 });
 
