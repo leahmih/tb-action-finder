@@ -163,6 +163,22 @@ flow works — country, time bucket, expand card, postcode entry, letter
 renders, Open in email hands off to the mail app correctly with the
 message intact.
 
+## Handoff
+
+- **UK ask vs TBFighters' live campaign.** The APPG ask in the UK letter
+  was written independently (from Parliament's own pages) while
+  tbfighters.org still pointed at a closed Results UK campaign. TBFighters
+  have since published a UK action on the same APPG report. The two are
+  aligned but not identical: theirs asks constituents to make their MP
+  AWARE of the report; ours asks the MP to JOIN the APPG and support its
+  recommendations. Ours is the larger ask. TBFighters should decide which
+  the card uses — it's their campaign.
+- Learn more for the UK card now points at their campaign page.
+- **Australia has a live TBFighters action** (increase the aid budget, via
+  results.org.au) and their action page now has an Australia region filter.
+  Australia was folded into "Other" in V1. V3 candidate with a campaign
+  already behind it.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
