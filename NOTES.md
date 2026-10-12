@@ -151,6 +151,18 @@ macOS "Keyboard navigation" enabled:
 Still to do: aria-live regions for the status line, error states and the
 "Copied" confirmation, then VoiceOver testing.
 
+aria-live: implemented and verified by LISTENING with VoiceOver, not by
+code review — a live region can look correct in the markup and announce
+nothing. Confirmed spoken: the lookup status, the error states, and the
+"Copied" confirmation. Live regions must exist in the DOM from the start
+and be empty; creating the element and its text in the same moment
+produces no announcement.
+
+Real-device test (iPhone, over LAN at http://<laptop-ip>:8000): full UK
+flow works — country, time bucket, expand card, postcode entry, letter
+renders, Open in email hands off to the mail app correctly with the
+message intact.
+
 ## Letter template shape (`letter` on uk-funding in actions.json)
 
 - `subject` — plain string, shown above the textarea.
@@ -286,3 +298,12 @@ Node testing.
 - Inexplicably input-specific failures during development are usually
   cache (the URL is the cache key). Hard reload first. Keep "Disable cache"
   ticked in the Network panel while devtools is open.
+- **navigator.clipboard needs a secure context.** It works on HTTPS and on
+  localhost, but NOT over plain HTTP to an IP address — which is how a
+  phone reaches a laptop's dev server on the LAN. Testing on a phone that
+  way, the copy button correctly falls back to "Couldn't copy
+  automatically. Select the text above and copy it manually." This is the
+  fallback working, not a bug: GitHub Pages and tbfighters.org are both
+  HTTPS, so the clipboard API will work in production. A correct fallback
+  firing in a test environment looks exactly like a bug — check what's
+  different about the environment before changing code.
