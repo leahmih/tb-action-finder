@@ -163,14 +163,14 @@ flow works — country, time bucket, expand card, postcode entry, letter
 renders, Open in email hands off to the mail app correctly with the
 message intact.
 
-## Day 14
+## Day 14 — done (13 Oct 2026)
 
-- [ ] Merge uk-lookup to main (the live site is still V1 until this happens)
-- [ ] After merging: re-test the copy button on a phone against the live
+- [x] Merge uk-lookup to main (the live site is still V1 until this happens)
+- [x] After merging: re-test the copy button on a phone against the live
       HTTPS URL, to confirm the clipboard path rather than the fallback
-- [ ] After merging: one full UK flow, one Danaher, one US card on the
+- [x] After merging: one full UK flow, one Danaher, one US card on the
       live site
-- [ ] Write HANDOFF.md
+- [x] Write V2HANDOFF.md
 
 ## Handoff
 
